@@ -6,14 +6,45 @@ public class Revendedor extends Pessoa{
 	private String cpf;
 	private String cep;
 	
-	public Revendedor(Long id, String nome, String telefone, 
-			String email, String sobrenome, String rg, String cpf, String cep) {
-		super(id, nome, telefone, email);
+	public static class Builder extends Pessoa.Builder<Builder>{
+		private String sobrenome;
+		private String rg;
+		private String cpf;
+		private String cep;
 		
-		this.sobrenome = sobrenome;
-		this.cep = cep;
-		this.cpf = cpf;
-		this.rg = rg;
+		public Builder() {}
+		
+		public Builder addSobrenome(String sobrenome) {
+			this.sobrenome = sobrenome;
+			return this;
+		}
+		
+		public Builder addRg(String rg) {
+			this.rg = rg;
+			return this;
+		}
+		
+		public Builder addCpf(String cpf) {
+			this.cpf = cpf;
+			return this;
+		}
+		
+		public Builder addCep(String cep) {
+			this.cep = cep;
+			return this;
+		}
+		
+		public Revendedor build() {
+			return new Revendedor(this);
+		}
+	}
+	
+	private Revendedor(Builder builder) {
+		super(builder);
+		this.sobrenome = builder.sobrenome;
+		this.rg = builder.rg;
+		this.cpf = builder.cpf;
+		this.cep = builder.cep;
 	}
 
 	public String getSobrenome() {

@@ -3,9 +3,24 @@ package com.pjoias.api.models;
 public class Vendedor extends Pessoa{
 	private String senha;
 	
-	public Vendedor(Long id, String nome, String telefone, String email) {
-		super(id, nome, telefone, email);
-		// TODO Auto-generated constructor stub
+	public static class Builder extends Pessoa.Builder<Builder> {
+		private String senha;
+		
+		public Builder() {}
+		
+		public Builder addSenha(String senha) {
+			this.senha = senha;
+			return this;
+		}
+		
+		public Vendedor build() {
+			return new Vendedor(this);
+		}
+	}
+	
+	private Vendedor(Builder builder) {
+		super(builder);
+		this.senha = builder.senha;
 	}
 	
 	public String getSenha() {
