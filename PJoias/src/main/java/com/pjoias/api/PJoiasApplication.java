@@ -8,6 +8,5 @@ public class PJoiasApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(PJoiasApplication.class, args);	
-		
 	}
 }
