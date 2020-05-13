@@ -1,0 +1,78 @@
+
+Levantamento de requisitos Banco de Dados: 
+
+* Administradores registram seus vendedores;
+* Vendedores registram seus revendedores;
+* Administradores criam maletas com produtos e elas podem ser ou não dadas a algum vendedor;
+* O vendedor terá um histórico com todas as maletas que ele já teve;
+* O vendedor poderá retirar produtos da maleta que possui (sem afetar o histórico), isso irá gerar o valor que ele vendeu de certa maleta (fechamento);
+* Após ele realizar o fechamento ele não pode mais alterar a maleta;
+* O vendedor pode editar e excluir revendedores;
+* Administradores tem acesso geral ao sistema, tanto quanto vendedores, quanto seus revendedores. O admin pode acompanhar as maletas de cada vendedor especifico;
+
+
+
+Objetivo do Banco de Dados: 
+
+* Centralizar o controle dos vendedores aos administradores, administrando as maletas que cada vendedor possui, qual o valor(R$) total de maletas que ele tem, atribuir novas maletas, manter o histórico de maletas de cada vendedor, realizar o fechamento de maletas.
+
+
+
+Identificando possiveis Entidades: 
+
+* Admin;
+* Vendedores;
+* Revendedores;
+* Maletas;
+
+
+Identificando possíveis relacionamentos: 
+
+* Vendedores dependem de administradores;
+* Revendedores dependem de  vendedores;
+* Maletas dependem de administradores;
+* Administrador atribui maletas a vendedores;
+* O vendedor recebe maletas;
+* O vendedor encerra(fecha) maletas;
+* O vendedor recebeu maletas;
+* Administradores removem revendedores;
+
+
+Identificando possíveis Atributos: 
+
+* Admin: 
+	- Identificador
+	- Nome
+	- Email
+	- Senha
+
+* Vendedor: 
+	- Identificador do admin que ele pertence
+	- Nome
+	- Email
+	- Telefone* 
+	- Senha
+
+* Revendedor:
+	- identificador
+	- Identificador do vendedor que ele pertence
+	- Nome
+	- Telefone
+	- Endereço 
+		- Rua 
+		- Cidade 
+		- Estado 
+		- CEP 
+	- RG
+	- CPF
+
+* Maleta: 
+	- Nome
+	- Valor total
+	- Produto
+		- Nome
+		- Valor
+
+
+
+

@@ -1,4 +1,4 @@
-package com.pjoias.api.models;
+package com.pjoias.api.models.users;
 
 public class Admin extends Pessoa{
 	private String senha;
