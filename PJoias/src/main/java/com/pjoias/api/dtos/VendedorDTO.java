@@ -38,8 +38,6 @@ public class VendedorDTO {
 	
 	public VendedorDTO(Vendedor vendedor) {
 		this.id = vendedor.getId();
-		this.nome = vendedor.getNome();
-		this.email = vendedor.getEmail();
 		this.sobrenome = vendedor.getSobrenome();
 		this.telefone = vendedor.getTelefone();
 		this.idAdmin = vendedor.getIdAdmin();

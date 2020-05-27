@@ -11,6 +11,7 @@ import com.pjoias.api.dtos.VendedorDTO;
 
 import lombok.Data;
 
+
 @Data
 @Entity
 @Table(name = "vendedor")

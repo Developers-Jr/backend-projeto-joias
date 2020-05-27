@@ -27,8 +27,8 @@ public class VendedorServiceImpl implements VendedorService {
 	}
 
 	@Override
-	public List<Vendedor> findAllByIdAdmin(Long id) {
-		return vendedorRepository.findByIdAdmin(id);
+	public List<Vendedor> findAll() {
+		return vendedorRepository.findAll();
 	}
 
 	@Override

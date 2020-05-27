@@ -10,7 +10,7 @@ public interface VendedorService {
 	
 	public Vendedor persist(Vendedor vendedor);
 	
-	public List<Vendedor> findAllByIdAdmin(Long id);
+	public List<Vendedor> findAll();
 	
 	public void deleteById(Long id);
 }
