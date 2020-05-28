@@ -16,17 +16,12 @@ public class AdminServiceImpl implements AdminService{
 	private AdminRepository adminRepository;
 
 	@Override
-	public Optional<Admin> buscarPorId(Long id) {
-		return adminRepository.findById(id);
-	}
-
-	@Override
-	public Optional<Admin> buscarPorEmailSenha(String email, String senha) {
-		return adminRepository.findByEmailAndSenha(email, senha);
-	}
-
-	@Override
 	public Optional<Admin> findById(Long id) {
 		return adminRepository.findById(id);
+	}
+
+	@Override
+	public Admin findByEmail(String email) {
+		return adminRepository.findByEmail(email);
 	}
 }

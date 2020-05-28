@@ -17,15 +17,11 @@ public class User {
 	@Column(name = "email")
 	private String email;
 	
-	@Column(name = "senha")
-	private String senha;
-	
 	public User() {}
 	
-	public User(String nome, String sobrenome, String email, String senha) {
+	public User(String nome, String sobrenome, String email) {
 		this.nome = nome;
 		this.sobrenome = sobrenome;
 		this.email = email;
-		this.senha = senha;
 	}
 }

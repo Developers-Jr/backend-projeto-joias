@@ -29,7 +29,7 @@ public class Vendedor extends User{
 	public Vendedor() {}
 	
 	public Vendedor(VendedorDTO dto) {
-		super(dto.getNome(), dto.getSobrenome(), dto.getEmail(), dto.getSenha());
+		super(dto.getNome(), dto.getSobrenome(), dto.getEmail());
 		this.telefone = dto.getTelefone();
 		this.idAdmin = dto.getIdAdmin();
 	}

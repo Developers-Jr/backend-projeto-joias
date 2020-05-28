@@ -26,18 +26,20 @@ public class VendedorDTO {
 	@Email
 	private String email;
 	
+	@NotNull
 	private String senha;
 	
 	@NotNull
 	private String telefone;
 	
-	@NotNull
 	private Long idAdmin;
 	
 	public VendedorDTO() {}
 	
 	public VendedorDTO(Vendedor vendedor) {
 		this.id = vendedor.getId();
+		this.email = vendedor.getEmail();
+		this.nome = vendedor.getNome();
 		this.sobrenome = vendedor.getSobrenome();
 		this.telefone = vendedor.getTelefone();
 		this.idAdmin = vendedor.getIdAdmin();

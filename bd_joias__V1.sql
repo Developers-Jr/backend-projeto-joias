@@ -1,11 +1,18 @@
 create database pjoias;
 use pjoias;
 
+create table user_login(
+	id bigint primary key auto_increment not null,
+	nome varchar(100) not null,
+    email varchar(255) not null,   
+    senha varchar(255) not null,
+    admin boolean not null default 0
+);
+
 create table admin(
 	id bigint primary key auto_increment not null,
     nome varchar(100) not null,
-	email varchar(255) not null,
-    senha varchar(255) not null,
+	email varchar(255) not null,  
     sobrenome varchar(255) not null
 );
 
@@ -14,7 +21,6 @@ create table vendedor(
     nome varchar(100) not null,
     email varchar(255) not null,
     sobrenome varchar(255) not null,
-    senha varchar(255) not null,
     telefone varchar(15) not null,
 	id_admin bigint not null,
     constraint fk_admin
@@ -89,9 +95,7 @@ create table produto(
 		references maleta(id)
 );
 
-select * from pjoias_user u;
-select * from vendedor;
-select * from admin;
-insert into pjoias_user(nome_user, email_user, senha_user, isAdmin) values ('caio', 'caio.ds.2003@gmail.com', '123456', true);
-insert into admin(sobrenome, id_user) values ('Mello', 1);
-insert into admin(sobrenome, id_user) values ('Oliveira', 1);
+select * from user_login;
+insert into admin(nome, email, sobrenome) values ('caio', 'caio.ds.2003@gmail.com', 'mello');
+insert into user_login(nome, email, senha, admin) values ('caio', 'caio.ds.2003@gmail.com', '$2a$10$4muEn3xA3FAERWOonzmkg.6Xa94pzDsCThGLDXDAr2F5RTWm50NZO', true);
+insert into user_login(nome, email, senha, admin) values ('gi', 'gi@gmail.com', '$2a$10$4muEn3xA3FAERWOonzmkg.6Xa94pzDsCThGLDXDAr2F5RTWm50NZO', false);
