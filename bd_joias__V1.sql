@@ -94,8 +94,3 @@ create table produto(
     foreign key(id_maleta)
 		references maleta(id)
 );
-
-select * from user_login;
-insert into admin(nome, email, sobrenome) values ('caio', 'caio.ds.2003@gmail.com', 'mello');
-insert into user_login(nome, email, senha, admin) values ('caio', 'caio.ds.2003@gmail.com', '$2a$10$4muEn3xA3FAERWOonzmkg.6Xa94pzDsCThGLDXDAr2F5RTWm50NZO', true);
-insert into user_login(nome, email, senha, admin) values ('gi', 'gi@gmail.com', '$2a$10$4muEn3xA3FAERWOonzmkg.6Xa94pzDsCThGLDXDAr2F5RTWm50NZO', false);

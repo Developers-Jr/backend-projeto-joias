@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.cors.CorsConfiguration;
 
 import com.pjoias.api.services.impl.CustomDetailServiceImpl;
 
@@ -33,7 +34,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.cors().and().csrf().disable()
+		http.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues())
+			.and().csrf().disable()
 	        .authorizeRequests()
 	        .antMatchers(HttpMethod.GET, SIGN_UP_URL).permitAll()
 	        .antMatchers("/*/admin/**").hasRole("ADMIN")

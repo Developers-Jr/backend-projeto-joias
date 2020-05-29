@@ -8,8 +8,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,9 +48,8 @@ public class VendedorController {
 	}
 	
 	@PostMapping("admin/vendedores")
-	public ResponseEntity<VendedorDTO> persiste(@Valid @RequestBody VendedorDTO vendedorDto) {
-		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		vendedorDto.setIdAdmin(adminService.findByEmail(user.getUsername()).getId());
+	public ResponseEntity<VendedorDTO> persiste(@Valid @RequestBody VendedorDTO vendedorDto, Authentication authentication) {
+		vendedorDto.setIdAdmin(adminService.findByEmail(authentication.getName()).getId());
 		
 		Vendedor vendedor = vendedorService.persist(new Vendedor(vendedorDto));
 		loginService.persist(new UserLogin(vendedorDto.getNome(), vendedorDto.getEmail(), PasswordEncoder.encode(vendedorDto.getSenha()), false));
