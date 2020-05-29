@@ -17,22 +17,32 @@ public class VendedorServiceImpl implements VendedorService {
 	private VendedorRepository vendedorRepository;
 
 	@Override
-	public Optional<Vendedor> findById(Long id) {
+	public Optional<Vendedor> buscarPorId(Long id) {
 		return vendedorRepository.findById(id);
 	}
 
 	@Override
-	public Vendedor persist(Vendedor vendedor) {
+	public Vendedor persistir(Vendedor vendedor) {
 		return vendedorRepository.save(vendedor);
 	}
 
 	@Override
-	public List<Vendedor> findAll() {
+	public List<Vendedor> buscarTodos() {
 		return vendedorRepository.findAll();
 	}
 
 	@Override
-	public void deleteById(Long id) {
+	public void deletarPorId(Long id) {
 		vendedorRepository.deleteById(id);
+	}
+
+	@Override
+	public Optional<Vendedor> buscarPorEmail(String email) {
+		return vendedorRepository.findByEmail(email);
+	}
+
+	@Override
+	public Optional<Vendedor> buscarPorTelefone(String telefone) {
+		return vendedorRepository.findByTelefone(telefone);
 	}
 }

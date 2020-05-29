@@ -21,7 +21,7 @@ public class UserLoginServiceImpl implements UserLoginService {
 	}
 
 	@Override
-	public UserLogin findByEmail(String email) {
+	public Optional<UserLogin> findByEmail(String email) {
 		return loginRepository.findByEmail(email);
 	}
 

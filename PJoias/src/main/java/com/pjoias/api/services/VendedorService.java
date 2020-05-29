@@ -6,11 +6,15 @@ import java.util.Optional;
 import com.pjoias.api.models.users.Vendedor;
 
 public interface VendedorService {
-	public Optional<Vendedor> findById(Long id);
+	public Optional<Vendedor> buscarPorId(Long id);
 	
-	public Vendedor persist(Vendedor vendedor);
+	public Vendedor persistir(Vendedor vendedor);
 	
-	public List<Vendedor> findAll();
+	public List<Vendedor> buscarTodos();
 	
-	public void deleteById(Long id);
+	public Optional<Vendedor> buscarPorTelefone(String telefone);
+	
+	public void deletarPorId(Long id);
+	
+	public Optional<Vendedor> buscarPorEmail(String email);
 }

@@ -4,7 +4,7 @@ use pjoias;
 create table user_login(
 	id bigint primary key auto_increment not null,
 	nome varchar(100) not null,
-    email varchar(255) not null,   
+    email varchar(255) not null,    
     senha varchar(255) not null,
     admin boolean not null default 0
 );
@@ -94,3 +94,10 @@ create table produto(
     foreign key(id_maleta)
 		references maleta(id)
 );
+
+select * from admin;
+
+select * from user_login;
+
+insert into user_login(nome, email, senha, admin) values ('caio', 'caio.ds.2003@gmail.com', 'caio', true);
+

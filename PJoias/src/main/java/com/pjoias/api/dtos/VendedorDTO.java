@@ -14,22 +14,21 @@ import lombok.Setter;
 public class VendedorDTO {
 	private Long id;
 	
-	@NotNull
+	@NotNull(message = "O nome não pode estar vazio")
 	@Size(min = 4)
 	private String nome;
 	
-	@NotNull
+	@NotNull(message = "O sobrenome não pode estar vazio")
 	@Size(min = 4)
 	private String sobrenome;
 	
 	@NotNull
-	@Email
+	@Email(message = "Este não é um e-mail válido")
 	private String email;
 	
-	@NotNull
 	private String senha;
 	
-	@NotNull
+	@NotNull(message = "O telefone não pode estar vazio")
 	private String telefone;
 	
 	private Long idAdmin;

@@ -26,7 +26,7 @@ public class UserLogin {
 	private String nome;
 	
 	@Email
-	@Column(unique = true)
+	@Column(name="email", unique = true)
 	private String email;
 	
 	@NotEmpty

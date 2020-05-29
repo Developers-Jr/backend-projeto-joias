@@ -7,7 +7,7 @@ import com.pjoias.api.models.users.UserLogin;
 public interface UserLoginService {
 	UserLogin persist(UserLogin userLogin);
 	
-	UserLogin findByEmail(String email);
+	Optional<UserLogin> findByEmail(String email);
 	
 	Optional<UserLogin> findById(Long id);
 	
