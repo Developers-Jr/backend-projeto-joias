@@ -9,6 +9,8 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,16 +44,19 @@ public class MaletaController {
 	 * @return ResponseEntity<Response<MaletaDTO>>
 	 */
 	@PostMapping("admin/maletas")
-	public ResponseEntity<Response<MaletaDTO>> persiste(@Valid @RequestBody MaletaDTO maletaDto, Authentication authentication) {
+	public ResponseEntity<Response<MaletaDTO>> persiste(@Valid @RequestBody MaletaDTO maletaDto, BindingResult result, Authentication authentication) {
 		Response<MaletaDTO> response = new Response<>();
-		Maleta maleta = new Maleta(maletaDto);
+		Long idAdmin = adminService.findByEmail(authentication.getName()).get().getId();
 		
-		Long idAdmin = adminService.findByEmail(authentication.getName()).getId();
-		if(idAdmin == null) {
-			response.addError("Admin inválido");
+		this.validarNomeMaleta(maletaDto.getNome(), result);
+		
+		if(result.hasErrors()) {
+			result.getAllErrors().forEach(err -> response.addError(err.getDefaultMessage()));
 			return ResponseEntity.badRequest().body(response);
 		}
 		
+
+		Maleta maleta = new Maleta(maletaDto);
 		maleta.setId_admin(idAdmin);
 		
 		maletaService.persist(maleta);
@@ -149,5 +154,13 @@ public class MaletaController {
 	private void atualizar(Maleta maleta, MaletaDTO maletaDto) {
 		maleta.setNome(maletaDto.getNome());
 		maleta.setStatus_maleta(maletaDto.isStatus_maleta());
+	}
+	
+	private void validarNomeMaleta(String nome, BindingResult result) {
+		Optional<Maleta> maleta = maletaService.buscarPorNome(nome);
+		
+		if(maleta.isPresent()) {
+			result.addError(new ObjectError("maletaExistente", "Já existe uma maleta com esse nome"));
+		}
 	}
 }

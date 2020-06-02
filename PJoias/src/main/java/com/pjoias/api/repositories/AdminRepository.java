@@ -9,5 +9,5 @@ import com.pjoias.api.models.users.Admin;
 public interface AdminRepository extends JpaRepository<Admin, Long>{
 	Optional<Admin> findById(Long id);
 	
-	Admin findByEmail(String email);
+	Optional<Admin> findByEmail(String email);
 }

@@ -12,12 +12,11 @@ import lombok.Setter;
 public class MaletaDTO {
 	private Long id;
 	
-	@NotNull
+	@NotNull(message = "O nome da maleta não pode estar vazio")
 	private String nome;
 	
 	private double valor;
 	
-	@NotNull
 	private boolean status_maleta;
 	
 	private Long id_admin;

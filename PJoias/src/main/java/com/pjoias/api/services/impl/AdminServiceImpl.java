@@ -21,7 +21,7 @@ public class AdminServiceImpl implements AdminService{
 	}
 
 	@Override
-	public Admin findByEmail(String email) {
+	public Optional<Admin> findByEmail(String email) {
 		return adminRepository.findByEmail(email);
 	}
 }

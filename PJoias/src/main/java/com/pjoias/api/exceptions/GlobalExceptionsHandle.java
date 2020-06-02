@@ -10,11 +10,15 @@ import com.pjoias.api.dtos.Response;
 public class GlobalExceptionsHandle {
 	
 	@ExceptionHandler(Exception.class)
-	public ResponseEntity<Response<String>> excecaoGenerica() {
+	public ResponseEntity<Response<String>> excecaoGenerica(Exception e) {
 		Response<String> response = new Response<>();
 		
-		response.setData("Algum erro ocorreu");
+		response.addError("Algo deu errado! \nMessage: " + e.getMessage());
 		return ResponseEntity.badRequest().body(response);
 	}
 
+	@ExceptionHandler(NotFoundException.class)
+	public ResponseEntity<Response<String>> notFoundException(NotFoundException e) {
+		return ResponseEntity.notFound().build();
+	}
 }

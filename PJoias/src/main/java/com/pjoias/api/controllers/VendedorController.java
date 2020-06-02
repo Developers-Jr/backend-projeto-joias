@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.pjoias.api.dtos.Response;
 import com.pjoias.api.dtos.VendedorDTO;
+import com.pjoias.api.exceptions.NotFoundException;
 import com.pjoias.api.models.users.UserLogin;
 import com.pjoias.api.models.users.Vendedor;
 import com.pjoias.api.services.AdminService;
@@ -70,9 +71,16 @@ public class VendedorController {
 	public ResponseEntity<Response<VendedorDTO>> persistir(@Valid @RequestBody VendedorDTO vendedorDto, BindingResult result, Authentication authentication) {
 		Response<VendedorDTO> response = new Response<>();
 		
-		vendedorDto.setIdAdmin(adminService.findByEmail(authentication.getName()).getId());
+		vendedorDto.setIdAdmin(adminService.findByEmail(authentication.getName())
+											.orElseThrow(() -> new NotFoundException("Admin not found"))
+											.getId());
+		
 		this.verificarEmailExistente(vendedorDto.getEmail(), result);
 		this.verificarTelefoneExistente(vendedorDto.getTelefone(), result);
+		
+		if(vendedorDto.getSenha() == null) {
+			result.addError(new ObjectError("senhaInvalida", "A senha não pode estar vazia"));
+		}
 		
 		if(result.hasErrors()) {
 			result.getAllErrors().forEach(err -> response.addError(err.getDefaultMessage()));
@@ -94,7 +102,7 @@ public class VendedorController {
 	@GetMapping("admin/vendedores/{id}")
 	public ResponseEntity<VendedorDTO> findById(@PathVariable("id") Long id) {
 		Optional<Vendedor> vendedor = vendedorService.buscarPorId(id);
-		return ResponseEntity.ok(new VendedorDTO(vendedor.get()));
+		return ResponseEntity.ok(new VendedorDTO(vendedor.orElseThrow(() -> new NotFoundException("Vendedor não encontrado"))));
 	}
 	
 	/**
@@ -110,18 +118,20 @@ public class VendedorController {
 													@PathVariable("id") Long id, BindingResult result) {
 		
 		Response<VendedorDTO> response = new Response<>();
-		Vendedor vendedor = vendedorService.buscarPorId(id).get();
-		UserLogin loginVendedor = loginService.findByEmail(vendedor.getEmail()).get();
+		Optional<Vendedor> vendedor = vendedorService.buscarPorId(id);
+		UserLogin loginVendedor = loginService.findByEmail(vendedor
+																	.orElseThrow(() -> new NotFoundException("Vendedor não encontrado"))
+																	.getEmail()).get();
 		
-		this.atualizarVendedor(vendedorDTO, vendedor, result, loginVendedor);
+		this.atualizarVendedor(vendedorDTO, vendedor.get(), result, loginVendedor);
 		if(result.hasErrors()) {
 			result.getAllErrors().forEach(err -> response.addError(err.getDefaultMessage()));
 			
 			return ResponseEntity.badRequest().body(response);
 		}
 		
-		vendedorService.persistir(vendedor);
-		response.setData(new VendedorDTO(vendedor));
+		vendedorService.persistir(vendedor.get());
+		response.setData(new VendedorDTO(vendedor.get()));
 		
 		return ResponseEntity.ok(response);
 	}
@@ -133,12 +143,16 @@ public class VendedorController {
 	 * @return ResponseEntity<Void>
 	 */
 	@DeleteMapping("admin/vendedores/{id}")
-	public ResponseEntity<Void> deletarPorId(@PathVariable("id") Long id) {
+	public ResponseEntity<Void> deletarPorId(@PathVariable("id") Long id) throws NotFoundException {
 		Optional<Vendedor> vendedor = vendedorService.buscarPorId(id);
-		UserLogin login = loginService.findByEmail(vendedor.get().getEmail()).get();
+		if(vendedor.isEmpty()) {
+			throw new NotFoundException("Vendedor não encontrado");
+		}
+		
+		Optional<UserLogin> login = loginService.findByEmail(vendedor.get().getEmail());
 		
 		if(login != null) {
-			loginService.deleteById(login.getId());
+			loginService.deleteById(login.get().getId());
 		}
 		
 		vendedorService.deletarPorId(id);
