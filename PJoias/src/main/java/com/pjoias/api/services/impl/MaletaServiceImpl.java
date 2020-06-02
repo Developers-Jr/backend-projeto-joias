@@ -22,18 +22,23 @@ public class MaletaServiceImpl implements MaletaService {
 	}
 
 	@Override
-	public Optional<Maleta> findById(Long id) {
+	public Optional<Maleta> buscarPorId(Long id) {
 		return maletaRepository.findById(id);
 	}
 
 	@Override
-	public List<Maleta> findAll() {
+	public List<Maleta> buscarTodos() {
 		return maletaRepository.findAll();
 	}
 
 	@Override
-	public Optional<Maleta> findByName(String nome) {
+	public Optional<Maleta> buscarPorNome(String nome) {
 		return maletaRepository.findByNome(nome);
+	}
+
+	@Override
+	public void deletarPorId(Long id) {
+		maletaRepository.deleteById(id);
 	}
 
 }

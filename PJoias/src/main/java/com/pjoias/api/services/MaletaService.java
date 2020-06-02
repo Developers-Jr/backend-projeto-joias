@@ -8,9 +8,11 @@ import com.pjoias.api.models.entities.Maleta;
 public interface MaletaService {
 	public Maleta persist(Maleta maleta);
 	
-	public Optional<Maleta> findById(Long id);
+	public Optional<Maleta> buscarPorId(Long id);
 	
-	public List<Maleta> findAll();
+	public List<Maleta> buscarTodos();
 	
-	public Optional<Maleta> findByName(String nome);
+	public Optional<Maleta> buscarPorNome(String nome);
+	
+	public void deletarPorId(Long id);
 }

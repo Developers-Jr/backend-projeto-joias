@@ -7,9 +7,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import lombok.Data;
+import com.pjoias.api.dtos.MaletaDTO;
 
-@Data
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 @Entity
 @Table(name = "maleta")
 public class Maleta {
@@ -25,4 +29,15 @@ public class Maleta {
 	
 	@Column(name = "status_maleta")
 	private boolean status_maleta;
+	
+	@Column(name = "id_admin")
+	private Long id_admin;
+	
+	public Maleta() {}
+	
+	public Maleta(MaletaDTO maletaDto) {
+		this.nome = maletaDto.getNome();
+		this.valor = maletaDto.getValor();
+		this.status_maleta = maletaDto.isStatus_maleta();
+	}
 }

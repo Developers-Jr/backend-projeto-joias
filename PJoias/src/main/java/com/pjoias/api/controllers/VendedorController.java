@@ -42,15 +42,30 @@ public class VendedorController {
 	@Autowired
 	private AdminService adminService;
 	
+	/**
+	 * Lista todos os vendedores 
+	 * 
+	 * @return ResponseEntity<Response<List<VendedorDTO>>>
+	 */
 	@GetMapping("admin/vendedores")
-	public ResponseEntity<List<VendedorDTO>> listarTodos() {
-		List<Vendedor> vendedores = vendedorService.buscarTodos();
-		List<VendedorDTO> dtos = vendedores.stream()
-											.map(v -> new VendedorDTO(v))
-											.collect(Collectors.toList());
-		return ResponseEntity.ok(dtos);
+	public ResponseEntity<Response<List<VendedorDTO>>> listarTodos(Authentication authentication) {
+		Response<List<VendedorDTO>> response = new Response<>();
+		List<VendedorDTO> vendedores = vendedorService.buscarTodos().stream()
+				.map(v -> new VendedorDTO(v))
+				.collect(Collectors.toList());
+		
+		response.setData(vendedores);
+		return ResponseEntity.ok(response);
 	}
 	
+	/**
+	 * Cadastra um novo vendedor 
+	 * 
+	 * @param vendedorDto
+	 * @param result
+	 * @param authentication
+	 * @return ResponseEntity<Response<VendedorDTO>>
+	 */
 	@PostMapping("admin/vendedores")
 	public ResponseEntity<Response<VendedorDTO>> persistir(@Valid @RequestBody VendedorDTO vendedorDto, BindingResult result, Authentication authentication) {
 		Response<VendedorDTO> response = new Response<>();
@@ -70,12 +85,26 @@ public class VendedorController {
 		return ResponseEntity.ok(response);
 	}
 	
+	/**
+	 * Busca um vendedor por seu id
+	 * 
+	 * @param id
+	 * @return ResponseEntity<VendedorDTO>
+	 */
 	@GetMapping("admin/vendedores/{id}")
 	public ResponseEntity<VendedorDTO> findById(@PathVariable("id") Long id) {
 		Optional<Vendedor> vendedor = vendedorService.buscarPorId(id);
 		return ResponseEntity.ok(new VendedorDTO(vendedor.get()));
 	}
 	
+	/**
+	 * Atualiza os dados de um vendedor 
+	 * 
+	 * @param vendedorDTO
+	 * @param id
+	 * @param result
+	 * @return ResponseEntity<Response<VendedorDTO>>
+	 */
 	@PutMapping("admin/vendedores/{id}")
 	public ResponseEntity<Response<VendedorDTO>> atualizar(@Valid @RequestBody VendedorDTO vendedorDTO, 
 													@PathVariable("id") Long id, BindingResult result) {
@@ -97,6 +126,12 @@ public class VendedorController {
 		return ResponseEntity.ok(response);
 	}
 	
+	/**
+	 * Deleta um vendedor de acordo com seu id
+	 * 
+	 * @param id
+	 * @return ResponseEntity<Void>
+	 */
 	@DeleteMapping("admin/vendedores/{id}")
 	public ResponseEntity<Void> deletarPorId(@PathVariable("id") Long id) {
 		Optional<Vendedor> vendedor = vendedorService.buscarPorId(id);
@@ -110,18 +145,38 @@ public class VendedorController {
 		return ResponseEntity.noContent().build();
 	}	
 	
+	/**
+	 * Valida email, verificando se este ja possui cadastro
+	 * 
+	 * @param email
+	 * @param result
+	 */
 	private void verificarEmailExistente(String email, BindingResult result) {
 		vendedorService.buscarPorEmail(email)
 			.ifPresent(erro -> result.addError(new ObjectError("emailInvalido", "Este email já foi cadastrado!")));
 		
 	}
 	
+	/**
+	 * Verificar telefone, caso haja cadastro torna invalido o registro 
+	 * 
+	 * @param telefone
+	 * @param result
+	 */
 	private void verificarTelefoneExistente(String telefone, BindingResult result) {
 		vendedorService.buscarPorTelefone(telefone)
 			.ifPresent(erro -> result.addError(new ObjectError("telefoneExistente", "Este telefone já foi cadastrado!")));
 		
 	}
 	
+	/**
+	 * Logica de negocio para atualizacao de vendedor 
+	 * 
+	 * @param vendedorDTO
+	 * @param vendedor
+	 * @param result
+	 * @param login
+	 */
 	private void atualizarVendedor(VendedorDTO vendedorDTO, Vendedor vendedor, BindingResult result, UserLogin login) {
 		if(!vendedorDTO.getEmail().equals(vendedor.getEmail())) {
 			this.verificarEmailExistente(vendedorDTO.getEmail(), result);
