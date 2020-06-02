@@ -153,7 +153,7 @@ public class MaletaController {
 	 */
 	private void atualizar(Maleta maleta, MaletaDTO maletaDto) {
 		maleta.setNome(maletaDto.getNome());
-		maleta.setStatus_maleta(maletaDto.isStatus_maleta());
+		maleta.setFechada(maletaDto.isFechada());
 	}
 	
 	private void validarNomeMaleta(String nome, BindingResult result) {

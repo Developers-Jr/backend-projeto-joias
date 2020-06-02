@@ -78,7 +78,7 @@ create table maleta(
 	id bigint primary key auto_increment not null, 
     nome varchar(100) not null,
     valor decimal not null default 0.00,
-    status_maleta boolean default true,
+    fechada boolean default true,
     id_admin bigint not null,
     constraint fk_id_admin
     foreign key(id_admin)
@@ -96,8 +96,13 @@ create table produto(
 );
 
 select * from admin;
-
+select * from vendedor;
 select * from user_login;
 
-insert into user_login(nome, email, senha, admin) values ('caio', 'caio.ds.2003@gmail.com', 'caio', true);
+select * from maleta;
 
+delete from vendedor;
+
+
+insert into user_login(nome, email, senha, admin) values ('caio', 'caio.ds.2003@gmail.com', '$2y$12$8WaWnP9zgDeoKzu2d.UcVO2V8XXRZovsfdL3HaUdRZceRLlmZuiwO', true);
+delete from user_login where admin = false;
