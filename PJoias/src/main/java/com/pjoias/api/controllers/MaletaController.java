@@ -129,7 +129,7 @@ public class MaletaController {
 	 * @return ResponseEntity<Response<MaletaDTO>>
 	 */
 	@PutMapping("admin/maletas/{id}")
-	public ResponseEntity<Response<MaletaDTO>> atualizar(@PathVariable("id") Long id, @RequestBody MaletaDTO maletaDto) {
+	public ResponseEntity<Response<MaletaDTO>> atualizarMaleta(@PathVariable("id") Long id, @RequestBody MaletaDTO maletaDto) {
 		Response<MaletaDTO> response = new Response<>();
 		Optional<Maleta> maleta = maletaService.buscarPorId(id);
 		

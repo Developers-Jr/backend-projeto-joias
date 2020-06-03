@@ -1,5 +1,7 @@
 package com.pjoias.api.services.impl;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,11 @@ public class ProdutoServiceImpl implements ProdutoService {
 	@Override
 	public void excluirPorId(Long id) {
 		produtoRepository.deleteById(id);
+	}
+
+	@Override
+	public Optional<Produto> buscarPorId(Long id) {
+		return produtoRepository.findById(id);
 	}
 
 }

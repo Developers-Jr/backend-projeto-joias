@@ -11,7 +11,7 @@ create table user_login(
 
 create table admin(
 	id bigint primary key auto_increment not null,
-    nome varchar(100) not null,
+    nome varchar(100) not null, 
 	email varchar(255) not null,  
     sobrenome varchar(255) not null
 );
@@ -77,7 +77,6 @@ create table maleta_historico(
 create table maleta(
 	id bigint primary key auto_increment not null, 
     nome varchar(100) not null,
-    valor decimal not null default 0.00,
     fechada boolean default true,
     id_admin bigint not null,
     constraint fk_id_admin
@@ -103,6 +102,6 @@ select * from maleta;
 
 delete from vendedor;
 
-
+insert into admin(nome, email, sobrenome) values ('caio', 'caio.ds.2003@gmail.com', 'mello');
 insert into user_login(nome, email, senha, admin) values ('caio', 'caio.ds.2003@gmail.com', '$2y$12$8WaWnP9zgDeoKzu2d.UcVO2V8XXRZovsfdL3HaUdRZceRLlmZuiwO', true);
 delete from user_login where admin = false;

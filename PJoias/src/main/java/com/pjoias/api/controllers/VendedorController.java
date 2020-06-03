@@ -72,7 +72,7 @@ public class VendedorController {
 		Response<VendedorDTO> response = new Response<>();
 		
 		vendedorDto.setIdAdmin(adminService.findByEmail(authentication.getName())
-											.orElseThrow(() -> new NotFoundException("Admin not found"))
+											.orElseThrow(() -> new NotFoundException())
 											.getId());
 		
 		this.verificarEmailExistente(vendedorDto.getEmail(), result);
@@ -102,7 +102,7 @@ public class VendedorController {
 	@GetMapping("admin/vendedores/{id}")
 	public ResponseEntity<VendedorDTO> findById(@PathVariable("id") Long id) {
 		Optional<Vendedor> vendedor = vendedorService.buscarPorId(id);
-		return ResponseEntity.ok(new VendedorDTO(vendedor.orElseThrow(() -> new NotFoundException("Vendedor não encontrado"))));
+		return ResponseEntity.ok(new VendedorDTO(vendedor.orElseThrow(() -> new NotFoundException())));
 	}
 	
 	/**
@@ -120,7 +120,7 @@ public class VendedorController {
 		Response<VendedorDTO> response = new Response<>();
 		Optional<Vendedor> vendedor = vendedorService.buscarPorId(id);
 		UserLogin loginVendedor = loginService.findByEmail(vendedor
-																	.orElseThrow(() -> new NotFoundException("Vendedor não encontrado"))
+																	.orElseThrow(() -> new NotFoundException())
 																	.getEmail()).get();
 		
 		this.atualizarVendedor(vendedorDTO, vendedor.get(), result, loginVendedor);
@@ -146,7 +146,7 @@ public class VendedorController {
 	public ResponseEntity<Void> deletarPorId(@PathVariable("id") Long id) throws NotFoundException {
 		Optional<Vendedor> vendedor = vendedorService.buscarPorId(id);
 		if(vendedor.isEmpty()) {
-			throw new NotFoundException("Vendedor não encontrado");
+			throw new NotFoundException();
 		}
 		
 		Optional<UserLogin> login = loginService.findByEmail(vendedor.get().getEmail());

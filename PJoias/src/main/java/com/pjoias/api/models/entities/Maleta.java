@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.pjoias.api.dtos.MaletaDTO;
 
@@ -28,7 +29,7 @@ public class Maleta {
 	@Column(name = "nome")
 	private String nome;
 	
-	@Column(name = "valor")
+	@Transient
 	private double valor;
 	
 	@Column(name = "fechada")

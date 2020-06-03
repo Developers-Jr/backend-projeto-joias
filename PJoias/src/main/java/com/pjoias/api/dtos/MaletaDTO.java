@@ -1,6 +1,7 @@
 package com.pjoias.api.dtos;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.validation.constraints.NotNull;
 
@@ -31,9 +32,22 @@ public class MaletaDTO {
 	public MaletaDTO(Maleta maleta) {
 		this.id = maleta.getId();
 		this.nome = maleta.getNome();
-		this.valor = maleta.getValor();
+		this.valor = maleta.getProdutos() != null ? this.calcularValorTotalProduto(maleta.getProdutos()) : 0.0;
 		this.fechada = maleta.isFechada();
 		this.produtos = maleta.getProdutos();
 		this.id_admin = maleta.getId_admin();
+	}
+	
+	private double calcularValorTotalProduto(List<Produto> produtos) {
+		double total = 0.0;
+		List<Double> valores = produtos.stream()
+										.map(p -> p.getValor())
+										.collect(Collectors.toList());
+		
+		for(double v : valores) {
+			total += v;
+		}
+		
+		return total;
 	}
 }

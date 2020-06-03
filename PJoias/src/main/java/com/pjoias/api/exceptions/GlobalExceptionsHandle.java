@@ -18,7 +18,7 @@ public class GlobalExceptionsHandle {
 	}
 
 	@ExceptionHandler(NotFoundException.class)
-	public ResponseEntity<Response<String>> notFoundException(NotFoundException e) {
+	public ResponseEntity<Response<String>> notFoundException() {
 		return ResponseEntity.notFound().build();
 	}
 }
