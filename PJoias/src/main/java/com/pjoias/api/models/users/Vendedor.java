@@ -9,10 +9,12 @@ import javax.persistence.Table;
 
 import com.pjoias.api.dtos.VendedorDTO;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "vendedor")
 public class Vendedor extends User{

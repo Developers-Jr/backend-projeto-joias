@@ -18,14 +18,22 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pjoias.api.dtos.Response;
 import com.pjoias.api.dtos.VendedorDTO;
 import com.pjoias.api.exceptions.NotFoundException;
+import com.pjoias.api.models.entities.Historico;
+import com.pjoias.api.models.entities.Maleta;
+import com.pjoias.api.models.entities.MaletaHistorico;
+import com.pjoias.api.models.entities.MaletaHistoricoId;
 import com.pjoias.api.models.users.UserLogin;
 import com.pjoias.api.models.users.Vendedor;
 import com.pjoias.api.services.AdminService;
+import com.pjoias.api.services.HistoricoService;
+import com.pjoias.api.services.MaletaHistoricoService;
+import com.pjoias.api.services.MaletaService;
 import com.pjoias.api.services.UserLoginService;
 import com.pjoias.api.services.VendedorService;
 import com.pjoias.api.utils.PasswordEncoder;
@@ -41,7 +49,16 @@ public class VendedorController {
 	private UserLoginService loginService;
 	
 	@Autowired
+	private HistoricoService historicoService;
+	
+	@Autowired
 	private AdminService adminService;
+	
+	@Autowired
+	private MaletaService maletaService;
+	
+	@Autowired
+	private MaletaHistoricoService maletaHistoricoService;
 	
 	/**
 	 * Lista todos os vendedores 
@@ -88,6 +105,7 @@ public class VendedorController {
 		}
 		
 		Vendedor vendedor = vendedorService.persistir(new Vendedor(vendedorDto));
+		historicoService.persistir(new Historico(vendedor.getId()));
 		loginService.persist(new UserLogin(vendedorDto.getNome(), vendedorDto.getEmail(), PasswordEncoder.encode(vendedorDto.getSenha()), false));
 		response.setData(new VendedorDTO(vendedor));
 		return ResponseEntity.ok(response);
@@ -136,6 +154,23 @@ public class VendedorController {
 		return ResponseEntity.ok(response);
 	}
 	
+	@PostMapping("admin/vendedores/vendedor")
+	public ResponseEntity<Void> atribuirMaleta(@RequestParam(name = "vendedorId") Long vendedorId, 
+															@RequestParam(name = "maletaId") Long maletaId) {
+		Optional<Historico> historico = historicoService.buscarPorIdVendedor(vendedorId);
+		Optional<Maleta> maleta = maletaService.buscarPorId(maletaId);
+		
+		if(historico.isPresent() && maleta.isPresent()) {
+			MaletaHistoricoId id = new MaletaHistoricoId(historico.get().getId(), maleta.get().getId());
+			MaletaHistorico maletaHistorico = new MaletaHistorico(id, maleta.get().getProdutos());
+			
+			maletaHistoricoService.persistir(maletaHistorico);
+			return ResponseEntity.accepted().build();
+		}
+		
+		return ResponseEntity.notFound().build();
+	}
+	
 	/**
 	 * Deleta um vendedor de acordo com seu id
 	 * 
@@ -150,11 +185,11 @@ public class VendedorController {
 		}
 		
 		Optional<UserLogin> login = loginService.findByEmail(vendedor.get().getEmail());
+		Optional<Historico> historico = historicoService.buscarPorIdVendedor(id);
 		
-		if(login != null) {
-			loginService.deleteById(login.get().getId());
-		}
-		
+		maletaHistoricoService.deletarPorIdHistorico(historico.get().getId());
+		historicoService.deletarPorId(historico.get().getId());
+		loginService.deleteById(login.get().getId());
 		vendedorService.deletarPorId(id);
 		return ResponseEntity.noContent().build();
 	}	

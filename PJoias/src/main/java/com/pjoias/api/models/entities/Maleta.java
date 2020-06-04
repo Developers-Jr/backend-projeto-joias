@@ -7,7 +7,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -38,8 +37,7 @@ public class Maleta {
 	@Column(name = "id_admin")
 	private Long id_admin;
 	
-	@OneToMany
-	@JoinColumn(name = "id_maleta")
+	@OneToMany(orphanRemoval = true, mappedBy = "idMaleta")
 	private List<Produto> produtos;
 	
 	public Maleta() {}

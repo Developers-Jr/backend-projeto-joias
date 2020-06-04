@@ -23,7 +23,10 @@ public class CustomDetailServiceImpl implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		UserLogin user = Optional.ofNullable(userRepository.findByEmail(username)).get().orElseThrow(() -> new UsernameNotFoundException("Usuario desconhecido"));
+		UserLogin user = Optional.ofNullable(userRepository.findByEmail(username))
+																.get()
+																.orElseThrow(() -> new UsernameNotFoundException("Usuario desconhecido"));
+		
 		List<GrantedAuthority> listAdminAuthorities = AuthorityUtils.createAuthorityList("ROLE_VENDEDOR", "ROLE_ADMIN");
 		List<GrantedAuthority> listUserAuthorities = AuthorityUtils.createAuthorityList("ROLE_VENDEDOR");
 		return new User(user.getEmail(), user.getSenha(), user.isAdmin() ? listAdminAuthorities : listUserAuthorities);

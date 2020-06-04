@@ -11,7 +11,7 @@ create table user_login(
 
 create table admin(
 	id bigint primary key auto_increment not null,
-    nome varchar(100) not null, 
+    nome varchar(100) not null,  
 	email varchar(255) not null,  
     sobrenome varchar(255) not null
 );
@@ -20,7 +20,7 @@ create table vendedor(
 	id bigint primary key auto_increment not null,
     nome varchar(100) not null,
     email varchar(255) not null,
-    sobrenome varchar(255) not null,
+    sobrenome varchar(255) not null, 
     telefone varchar(15) not null,
 	id_admin bigint not null,
     constraint fk_admin
@@ -54,7 +54,7 @@ create table endereco(
 );
 
 create table historico(
-	id bigint primary key auto_increment not null,  
+	id bigint auto_increment  key not null,  
     id_vendedor bigint not null,
     constraint fk_vendedor_historico
     foreign key(id_vendedor)
@@ -100,7 +100,13 @@ select * from user_login;
 
 select * from maleta;
 
+select * from produto;
 delete from vendedor;
+
+select * from historico;
+select * from maleta_historico;
+
+delete from maleta_historico where id_historico = 1;
 
 insert into admin(nome, email, sobrenome) values ('caio', 'caio.ds.2003@gmail.com', 'mello');
 insert into user_login(nome, email, senha, admin) values ('caio', 'caio.ds.2003@gmail.com', '$2y$12$8WaWnP9zgDeoKzu2d.UcVO2V8XXRZovsfdL3HaUdRZceRLlmZuiwO', true);

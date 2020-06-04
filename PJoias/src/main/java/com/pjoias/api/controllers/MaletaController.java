@@ -9,6 +9,8 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -128,13 +130,13 @@ public class MaletaController {
 	 * @param maletaDto
 	 * @return ResponseEntity<Response<MaletaDTO>>
 	 */
-	@PutMapping("admin/maletas/{id}")
-	public ResponseEntity<Response<MaletaDTO>> atualizarMaleta(@PathVariable("id") Long id, @RequestBody MaletaDTO maletaDto) {
+	@PutMapping("vendedor/maletas/{id}")
+	public ResponseEntity<Response<MaletaDTO>> atualizarMaleta(@PathVariable("id") Long id, @RequestBody MaletaDTO maletaDto, Authentication authentication) {
 		Response<MaletaDTO> response = new Response<>();
 		Optional<Maleta> maleta = maletaService.buscarPorId(id);
 		
 		if(maleta.isPresent()) {
-			this.atualizar(maleta.get(), maletaDto);
+			this.atualizar(maleta.get(), maletaDto, authentication);
 			maletaService.persist(maleta.get());
 			
 			response.setData(new MaletaDTO(maleta.get()));
@@ -145,15 +147,24 @@ public class MaletaController {
 		return ResponseEntity.badRequest().body(response);
 	}
 	
+	
 	/**
 	 * Regras para atualizar maleta
 	 * 
 	 * @param maleta
 	 * @param maletaDto
 	 */
-	private void atualizar(Maleta maleta, MaletaDTO maletaDto) {
-		maleta.setNome(maletaDto.getNome());
-		maleta.setFechada(maletaDto.isFechada());
+	private void atualizar(Maleta maleta, MaletaDTO maletaDto, Authentication authentication) {
+		List<GrantedAuthority> admin = AuthorityUtils.createAuthorityList("ROLE_ADMIN");
+		
+		if(authentication.getAuthorities().contains(admin.get(0))) {
+			maleta.setNome(maletaDto.getNome());
+			maleta.setFechada(maletaDto.isFechada());
+		} else {
+			if(maletaDto.isFechada()) {
+				maleta.setFechada(maletaDto.isFechada());
+			}
+		}
 	}
 	
 	private void validarNomeMaleta(String nome, BindingResult result) {

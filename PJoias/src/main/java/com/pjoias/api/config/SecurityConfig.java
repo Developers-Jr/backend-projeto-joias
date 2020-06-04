@@ -22,16 +22,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	@Autowired
 	private CustomDetailServiceImpl customDetailService;
 	
-//	@Override
-//	protected void configure(HttpSecurity http) throws Exception {
-//		http.authorizeRequests()
-//			.antMatchers("/*/admin/**").hasRole("ADMIN")
-//			.and()
-//			.httpBasic()
-//			.and()
-//			.csrf().disable();
-//	}
-	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues())
@@ -39,6 +29,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	        .authorizeRequests()
 	        .antMatchers(HttpMethod.GET, SIGN_UP_URL).permitAll()
 	        .antMatchers("/*/admin/**").hasRole("ADMIN")
+	        .antMatchers("/*/vendedor/**").hasRole("VENDEDOR")
 	        .and()
 	        .addFilter(new JWTAuthenticationFilter(authenticationManager()))
 	        .addFilter(new JWTAuthorizationFilter(authenticationManager(), customDetailService));
