@@ -153,7 +153,14 @@ public class VendedorController {
 		
 		return ResponseEntity.ok(response);
 	}
-	
+ 	
+	/**
+	 * Atribuindo maleta ao histórico do vendedor
+	 * 
+	 * @param vendedorId
+	 * @param maletaId
+	 * @return ResponseEntity<Void>
+	 */
 	@PostMapping("admin/vendedores/vendedor")
 	public ResponseEntity<Void> atribuirMaleta(@RequestParam(name = "vendedorId") Long vendedorId, 
 															@RequestParam(name = "maletaId") Long maletaId) {

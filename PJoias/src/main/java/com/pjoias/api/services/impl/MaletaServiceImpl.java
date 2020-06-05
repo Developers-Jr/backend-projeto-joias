@@ -41,4 +41,9 @@ public class MaletaServiceImpl implements MaletaService {
 		maletaRepository.deleteById(id);
 	}
 
+	@Override
+	public List<Maleta> buscarPorIdVendedor(Long id) {
+		return maletaRepository.findByIdVendedor(id);
+	}
+
 }

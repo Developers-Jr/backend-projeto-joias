@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pjoias.api.dtos.MaletaDTO;
@@ -108,6 +109,22 @@ public class MaletaController {
 		
 		response.addError("Maleta inexistente!");
 		return ResponseEntity.badRequest().body(response);
+	}
+	
+	/**
+	 * Busca maletas atribuidas a um vendedor
+	 * 
+	 * @param vendedorId
+	 * @return ResponseEntity<Response<List<MaletaDTO>>>
+	 */
+	@GetMapping("admin/maletas/busca")
+	public ResponseEntity<Response<List<MaletaDTO>>> buscarMaletasPorVendedor(@RequestParam("vendedor") Long vendedorId) {
+		Response<List<MaletaDTO>> response = new Response<>();
+		List<Maleta> maletas = maletaService.buscarPorIdVendedor(vendedorId);
+		
+		List<MaletaDTO> listMaletaDto = maletas.stream().map(m -> new MaletaDTO(m)).collect(Collectors.toList());
+		response.setData(listMaletaDto);
+		return ResponseEntity.ok(response);
 	}
 	
 	/**
