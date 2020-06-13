@@ -80,7 +80,7 @@ public class ProdutoController {
 	private void validarValorEMaleta(ProdutoDTO produtoDto, BindingResult result) {
 		Optional<Maleta> maleta = maletaService.buscarPorId(produtoDto.getIdMaleta());
 		
-		if(maleta.isEmpty()) {
+		if(maleta.get() == null) {
 			result.addError(new ObjectError("maletaInexistente", "A maleta indicada não existe"));
 		}
 		

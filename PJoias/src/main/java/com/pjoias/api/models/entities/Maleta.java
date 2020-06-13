@@ -5,11 +5,12 @@ import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+
+import org.hibernate.annotations.GenericGenerator;
 
 import com.pjoias.api.dtos.MaletaDTO;
 
@@ -21,8 +22,10 @@ import lombok.Setter;
 @Entity
 @Table(name = "maleta")
 public class Maleta {
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	
 	@Id
+	@GeneratedValue(generator = "increment")
+	@GenericGenerator(name = "increment", strategy = "increment")
 	private Long id;
 	
 	@Column(name = "nome")

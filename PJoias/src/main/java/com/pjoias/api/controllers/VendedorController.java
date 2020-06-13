@@ -187,7 +187,7 @@ public class VendedorController {
 	@DeleteMapping("admin/vendedores/{id}")
 	public ResponseEntity<Void> deletarPorId(@PathVariable("id") Long id) throws NotFoundException {
 		Optional<Vendedor> vendedor = vendedorService.buscarPorId(id);
-		if(vendedor.isEmpty()) {
+		if(vendedor.get() == null) {
 			throw new NotFoundException();
 		}
 		
