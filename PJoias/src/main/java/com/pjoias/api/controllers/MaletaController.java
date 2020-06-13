@@ -135,6 +135,10 @@ public class MaletaController {
 	 */
 	@DeleteMapping("admin/maletas/{id}")
 	public ResponseEntity<Response<Void>> deletarPorId(@PathVariable("id") Long id) {
+		if(!maletaService.buscarPorId(id).isPresent()) {
+			return ResponseEntity.notFound().build();
+		}
+		
 		maletaService.deletarPorId(id);
 		
 		return ResponseEntity.noContent().build();
@@ -175,7 +179,6 @@ public class MaletaController {
 		List<GrantedAuthority> admin = AuthorityUtils.createAuthorityList("ROLE_ADMIN");
 		
 		if(authentication.getAuthorities().contains(admin.get(0))) {
-			maleta.setNome(maletaDto.getNome());
 			maleta.setFechada(maletaDto.isFechada());
 		} else {
 			if(maletaDto.isFechada()) {
