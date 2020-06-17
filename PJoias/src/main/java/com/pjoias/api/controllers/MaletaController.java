@@ -9,8 +9,6 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,9 +23,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.pjoias.api.dtos.MaletaDTO;
 import com.pjoias.api.dtos.Response;
+import com.pjoias.api.exceptions.NotFoundException;
 import com.pjoias.api.models.entities.Maleta;
+import com.pjoias.api.models.entities.MaletaAtual;
+import com.pjoias.api.models.entities.MaletaAtualId;
+import com.pjoias.api.models.users.Vendedor;
 import com.pjoias.api.services.AdminService;
+import com.pjoias.api.services.MaletaAtualService;
 import com.pjoias.api.services.MaletaService;
+import com.pjoias.api.services.VendedorService;
 
 @RestController
 @RequestMapping("v1")
@@ -38,6 +42,12 @@ public class MaletaController {
 	
 	@Autowired
 	private AdminService adminService;
+	
+	@Autowired
+	private MaletaAtualService maletaAtualService;
+	
+	@Autowired
+	private VendedorService vendedorService;
 	
 	/**
 	 * Cadastra maleta 
@@ -70,7 +80,7 @@ public class MaletaController {
 	/**
 	 * Lista todas maletas 
 	 * 
-	 * @param authentication
+	 * @param authenticationResponseEntity<Response<MaletaDTO>>
 	 * @return ResponseEntity<Response<List<MaletaDTO>>>
 	 */
 	@GetMapping("admin/maletas")
@@ -108,7 +118,7 @@ public class MaletaController {
 		}
 		
 		response.addError("Maleta inexistente!");
-		return ResponseEntity.badRequest().body(response);
+		return ResponseEntity.notFound().build();
 	}
 	
 	/**
@@ -134,30 +144,38 @@ public class MaletaController {
 	 * @return ResponseEntity<Response<Void>>
 	 */
 	@DeleteMapping("admin/maletas/{id}")
-	public ResponseEntity<Response<Void>> deletarPorId(@PathVariable("id") Long id) {
+	public ResponseEntity<Response<String>> deletarPorId(@PathVariable("id") Long id) {
+		Response<String> response = new Response<>();
+		
 		if(!maletaService.buscarPorId(id).isPresent()) {
 			return ResponseEntity.notFound().build();
 		}
 		
-		maletaService.deletarPorId(id);
+		try {
+			maletaService.deletarPorId(id);
+		} catch(Exception e) {
+			response.addError("A maleta está atribuida em um histórico, não é possível a deletar!");
+			return ResponseEntity.badRequest().body(response);
+		}
+		
 		
 		return ResponseEntity.noContent().build();
 	}
 	
 	/**
-	 * Atualiza maleta
+	 * Admin atualiza maleta
 	 * 
 	 * @param id
 	 * @param maletaDto
 	 * @return ResponseEntity<Response<MaletaDTO>>
 	 */
-	@PutMapping("vendedor/maletas/{id}")
-	public ResponseEntity<Response<MaletaDTO>> atualizarMaleta(@PathVariable("id") Long id, @RequestBody MaletaDTO maletaDto, Authentication authentication) {
+	@PutMapping("admin/maletas/{id}")
+	public ResponseEntity<Response<MaletaDTO>> atualizarMaletaAdmin(@PathVariable("id") Long id, @RequestBody MaletaDTO maletaDto) {
 		Response<MaletaDTO> response = new Response<>();
 		Optional<Maleta> maleta = maletaService.buscarPorId(id);
 		
 		if(maleta.isPresent()) {
-			this.atualizar(maleta.get(), maletaDto, authentication);
+			maleta.get().setFechada(maletaDto.isFechada());
 			maletaService.persist(maleta.get());
 			
 			response.setData(new MaletaDTO(maleta.get()));
@@ -168,23 +186,36 @@ public class MaletaController {
 		return ResponseEntity.badRequest().body(response);
 	}
 	
-	
 	/**
-	 * Regras para atualizar maleta
+	 * Vendedor faz o fechamento da maleta
 	 * 
-	 * @param maleta
-	 * @param maletaDto
+	 * @return ResponseEntity<Response<MaletaDTO>>
 	 */
-	private void atualizar(Maleta maleta, MaletaDTO maletaDto, Authentication authentication) {
-		List<GrantedAuthority> admin = AuthorityUtils.createAuthorityList("ROLE_ADMIN");
+	@PutMapping("vendedor/maletas/{id}")
+	public ResponseEntity<Response<String>> atualizarMaletaVendedor(@PathVariable("id") Long idMaleta, @RequestBody MaletaDTO maletaDto, Authentication authentication) {
+		Response<String> response = new Response<>();
 		
-		if(authentication.getAuthorities().contains(admin.get(0))) {
-			maleta.setFechada(maletaDto.isFechada());
-		} else {
-			if(maletaDto.isFechada()) {
-				maleta.setFechada(maletaDto.isFechada());
-			}
-		}
+		Vendedor vendedor = vendedorService.buscarPorEmail(authentication.getName())
+															.orElseThrow(() -> new NotFoundException("Você precisa ser um vendedor!"));
+		
+		MaletaAtual maletaAtual = maletaAtualService.buscarPorId(new MaletaAtualId(vendedor.getId(), idMaleta))
+																	.orElseThrow(() -> new NotFoundException("Esta maleta não esta atribuída a você!"));
+		
+		if(maletaDto.isFechada()) {
+			Maleta maleta = maletaService.buscarPorId(maletaAtual.getIdMaletaAtual().getIdMaleta())
+																.orElseThrow(() ->  new NotFoundException("Maleta não encontrada!"));
+			
+			
+			maletaAtual.setFechada(true);
+			maleta.setFechada(true);
+			
+			maletaService.persist(maleta);
+			maletaAtualService.persistir(maletaAtual);
+			return ResponseEntity.ok(null);
+		} 
+		
+		response.addError("Esta maleta já foi fechada!");
+		return ResponseEntity.badRequest().body(response);
 	}
 	
 	private void validarNomeMaleta(String nome, BindingResult result) {

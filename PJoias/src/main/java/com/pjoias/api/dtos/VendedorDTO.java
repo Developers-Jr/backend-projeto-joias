@@ -31,16 +31,19 @@ public class VendedorDTO {
 	@NotNull(message = "O telefone não pode estar vazio")
 	private String telefone;
 	
+	private double valorDeMaletasTotal;
+	
 	private Long idAdmin;
 	
 	public VendedorDTO() {}
 	
-	public VendedorDTO(Vendedor vendedor) {
+	public VendedorDTO(Vendedor vendedor, double valorDeMaletasTotal) {
 		this.id = vendedor.getId();
 		this.email = vendedor.getEmail();
 		this.nome = vendedor.getNome();
 		this.sobrenome = vendedor.getSobrenome();
 		this.telefone = vendedor.getTelefone();
 		this.idAdmin = vendedor.getIdAdmin();
+		this.valorDeMaletasTotal = valorDeMaletasTotal;
 	}
 }

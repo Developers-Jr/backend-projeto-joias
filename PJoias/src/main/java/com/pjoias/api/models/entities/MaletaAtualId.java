@@ -9,19 +9,20 @@ import lombok.Data;
 
 @Data
 @Embeddable
-public class MaletaHistoricoId implements Serializable {
+public class MaletaAtualId implements Serializable {
+	
+	public MaletaAtualId() {}
+	
+	public MaletaAtualId(Long idVendedor, Long idMaleta) {
+		this.idVendedor = idVendedor;
+		this.idMaleta = idMaleta;
+	}
+
 	private static final long serialVersionUID = 1L;
 
-	@Column(name = "id_historico")
-	private Long idHistorico;
+	@Column(name = "id_vendedor")
+	private Long idVendedor;
 	
 	@Column(name = "id_maleta")
 	private Long idMaleta;
-	
-	public MaletaHistoricoId() {}
-	
-	public MaletaHistoricoId(Long idHistorico, Long idMaleta) {
-		this.idHistorico = idHistorico;
-		this.idMaleta = idMaleta;
-	}
 }

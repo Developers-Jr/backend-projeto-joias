@@ -11,7 +11,7 @@ public interface MaletaService {
 	public Optional<Maleta> buscarPorId(Long id);
 	
 	public List<Maleta> buscarTodos();
-	
+	 
 	public List<Maleta> buscarPorIdVendedor(Long id);
 	
 	public Optional<Maleta> buscarPorNome(String nome);

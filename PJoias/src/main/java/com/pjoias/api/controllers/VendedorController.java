@@ -26,12 +26,14 @@ import com.pjoias.api.dtos.VendedorDTO;
 import com.pjoias.api.exceptions.NotFoundException;
 import com.pjoias.api.models.entities.Historico;
 import com.pjoias.api.models.entities.Maleta;
+import com.pjoias.api.models.entities.MaletaAtual;
+import com.pjoias.api.models.entities.MaletaAtualId;
 import com.pjoias.api.models.entities.MaletaHistorico;
-import com.pjoias.api.models.entities.MaletaHistoricoId;
 import com.pjoias.api.models.users.UserLogin;
 import com.pjoias.api.models.users.Vendedor;
 import com.pjoias.api.services.AdminService;
 import com.pjoias.api.services.HistoricoService;
+import com.pjoias.api.services.MaletaAtualService;
 import com.pjoias.api.services.MaletaHistoricoService;
 import com.pjoias.api.services.MaletaService;
 import com.pjoias.api.services.UserLoginService;
@@ -60,6 +62,9 @@ public class VendedorController {
 	@Autowired
 	private MaletaHistoricoService maletaHistoricoService;
 	
+	@Autowired
+	private MaletaAtualService maletaAtualService;
+	
 	/**
 	 * Lista todos os vendedores 
 	 * 
@@ -69,8 +74,10 @@ public class VendedorController {
 	public ResponseEntity<Response<List<VendedorDTO>>> listarTodos(Authentication authentication) {
 		Response<List<VendedorDTO>> response = new Response<>();
 		List<VendedorDTO> vendedores = vendedorService.buscarTodos().stream()
-				.map(v -> new VendedorDTO(v))
+				.map(v -> new VendedorDTO(v, this.calculaValorMaletas(v.getId())))
 				.collect(Collectors.toList());
+		
+		
 		
 		response.setData(vendedores);
 		return ResponseEntity.ok(response);
@@ -89,14 +96,14 @@ public class VendedorController {
 		Response<VendedorDTO> response = new Response<>();
 		
 		vendedorDto.setIdAdmin(adminService.findByEmail(authentication.getName())
-											.orElseThrow(() -> new NotFoundException())
+											.orElseThrow(() -> new NotFoundException("Ocorreu um problema, fale com o admin do sistema!"))
 											.getId());
 		
 		this.verificarEmailExistente(vendedorDto.getEmail(), result);
 		this.verificarTelefoneExistente(vendedorDto.getTelefone(), result);
 		
-		if(vendedorDto.getSenha() == null) {
-			result.addError(new ObjectError("senhaInvalida", "A senha não pode estar vazia"));
+		if(vendedorDto.getSenha() == null || vendedorDto.getSenha().length() < 5) {
+			result.addError(new ObjectError("senhaInvalida", "A senha não pode estar vazia e deve conter mais de 5 caracteres!"));
 		}
 		
 		if(result.hasErrors()) {
@@ -107,7 +114,7 @@ public class VendedorController {
 		Vendedor vendedor = vendedorService.persistir(new Vendedor(vendedorDto));
 		historicoService.persistir(new Historico(vendedor.getId()));
 		loginService.persist(new UserLogin(vendedorDto.getNome(), vendedorDto.getEmail(), PasswordEncoder.encode(vendedorDto.getSenha()), false));
-		response.setData(new VendedorDTO(vendedor));
+		response.setData(new VendedorDTO(vendedor, 0.0));
 		return ResponseEntity.ok(response);
 	}
 	
@@ -118,9 +125,9 @@ public class VendedorController {
 	 * @return ResponseEntity<VendedorDTO>
 	 */
 	@GetMapping("admin/vendedores/{id}")
-	public ResponseEntity<VendedorDTO> findById(@PathVariable("id") Long id) {
-		Optional<Vendedor> vendedor = vendedorService.buscarPorId(id);
-		return ResponseEntity.ok(new VendedorDTO(vendedor.orElseThrow(() -> new NotFoundException())));
+	public ResponseEntity<VendedorDTO> buscarPorId(@PathVariable("id") Long id) {
+		Vendedor vendedor = vendedorService.buscarPorId(id).orElseThrow(() -> new NotFoundException("Vendedor não encontrado!"));
+		return ResponseEntity.ok(new VendedorDTO(vendedor, this.calculaValorMaletas(vendedor.getId())));
 	}
 	
 	/**
@@ -136,20 +143,20 @@ public class VendedorController {
 													@PathVariable("id") Long id, BindingResult result) {
 		
 		Response<VendedorDTO> response = new Response<>();
-		Optional<Vendedor> vendedor = vendedorService.buscarPorId(id);
-		UserLogin loginVendedor = loginService.findByEmail(vendedor
-																	.orElseThrow(() -> new NotFoundException())
-																	.getEmail()).get();
+		Vendedor vendedor = vendedorService.buscarPorId(id)
+												.orElseThrow(() -> new NotFoundException("Vendedor não encontrado!"));
 		
-		this.atualizarVendedor(vendedorDTO, vendedor.get(), result, loginVendedor);
+		UserLogin loginVendedor = loginService.findByEmail(vendedor.getEmail()).get();
+		
+		this.atualizarVendedor(vendedorDTO, vendedor, result, loginVendedor);
 		if(result.hasErrors()) {
 			result.getAllErrors().forEach(err -> response.addError(err.getDefaultMessage()));
 			
 			return ResponseEntity.badRequest().body(response);
 		}
 		
-		vendedorService.persistir(vendedor.get());
-		response.setData(new VendedorDTO(vendedor.get()));
+		vendedorService.persistir(vendedor);
+		response.setData(new VendedorDTO(vendedor, this.calculaValorMaletas(vendedor.getId())));
 		
 		return ResponseEntity.ok(response);
 	}
@@ -164,18 +171,26 @@ public class VendedorController {
 	@PostMapping("admin/vendedores/vendedor")
 	public ResponseEntity<Void> atribuirMaleta(@RequestParam(name = "vendedorId") Long vendedorId, 
 															@RequestParam(name = "maletaId") Long maletaId) {
-		Optional<Historico> historico = historicoService.buscarPorIdVendedor(vendedorId);
-		Optional<Maleta> maleta = maletaService.buscarPorId(maletaId);
 		
-		if(historico.isPresent() && maleta.isPresent()) {
-			MaletaHistoricoId id = new MaletaHistoricoId(historico.get().getId(), maleta.get().getId());
-			MaletaHistorico maletaHistorico = new MaletaHistorico(id, maleta.get().getProdutos());
-			
-			maletaHistoricoService.persistir(maletaHistorico);
-			return ResponseEntity.accepted().build();
-		}
+		Vendedor vendedor = vendedorService.buscarPorId(vendedorId)
+											.orElseThrow(() -> new NotFoundException("Vendedor não encontrado!"));
 		
-		return ResponseEntity.notFound().build();
+		Maleta maleta = maletaService.buscarPorId(maletaId)
+										.orElseThrow(() -> new NotFoundException("Maleta não encontrada!"));
+		
+		Historico historico = historicoService.buscarPorIdVendedor(vendedorId)
+												.orElseThrow(() -> new NotFoundException("Este vendedor não possui histórico!"));
+		
+		
+		MaletaAtualId id = new MaletaAtualId(vendedor.getId(), maleta.getId());
+		MaletaAtual maletaAtual = new MaletaAtual(id, maleta.getProdutos());
+		
+		maletaHistoricoService.persistir(new MaletaHistorico(historico.getId(),
+											maleta.getId(), maleta.getProdutos()));
+		
+		maletaAtualService.persistir(maletaAtual);
+		return ResponseEntity.accepted().build();
+
 	}
 	
 	/**
@@ -186,18 +201,17 @@ public class VendedorController {
 	 */
 	@DeleteMapping("admin/vendedores/{id}")
 	public ResponseEntity<Void> deletarPorId(@PathVariable("id") Long id) throws NotFoundException {
-		Optional<Vendedor> vendedor = vendedorService.buscarPorId(id);
-		if(vendedor.get() == null) {
-			throw new NotFoundException();
-		}
+		Vendedor vendedor = vendedorService.buscarPorId(id).orElseThrow(() -> new NotFoundException("Vendedor não encontrado!"));
 		
-		Optional<UserLogin> login = loginService.findByEmail(vendedor.get().getEmail());
+		Optional<UserLogin> login = loginService.findByEmail(vendedor.getEmail());
 		Optional<Historico> historico = historicoService.buscarPorIdVendedor(id);
-		
+
+		maletaAtualService.deletarPorIdVendedor(vendedor.getId());
 		maletaHistoricoService.deletarPorIdHistorico(historico.get().getId());
 		historicoService.deletarPorId(historico.get().getId());
 		loginService.deleteById(login.get().getId());
 		vendedorService.deletarPorId(id);
+		
 		return ResponseEntity.noContent().build();
 	}	
 	
@@ -250,5 +264,15 @@ public class VendedorController {
 		if(vendedorDTO.getSenha() != null && vendedorDTO.getSenha() != "") {
 			login.setSenha(PasswordEncoder.encode(vendedorDTO.getSenha()));
 		}
+	}
+	
+	/**
+	 * Busca e retorna o total do valor da soma de cada maleta atribuida a esse vendedor
+	 * 
+	 * @param id
+	 * @return
+	 */
+	private double calculaValorMaletas(Long id) {
+		return 1;
 	}
 }

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.pjoias.api.models.entities.Maleta;
+import com.pjoias.api.models.entities.MaletaAtual;
 import com.pjoias.api.repositories.MaletaRepository;
 import com.pjoias.api.services.MaletaService;
 
@@ -45,5 +46,4 @@ public class MaletaServiceImpl implements MaletaService {
 	public List<Maleta> buscarPorIdVendedor(Long id) {
 		return maletaRepository.findByIdVendedor(id);
 	}
-
 }

@@ -7,12 +7,13 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.pjoias.api.models.entities.MaletaHistorico;
+import com.pjoias.api.models.entities.MaletaAtual;
+import com.pjoias.api.models.entities.MaletaAtualId;
 
-public interface MaletaHistoricoRepository extends JpaRepository<MaletaHistorico, Long>{
+public interface MaletaAtualRepository extends JpaRepository<MaletaAtual, MaletaAtualId>{
 	
 	@Transactional
 	@Modifying
-	@Query("DELETE FROM MaletaHistorico MH WHERE MH.idHistorico = :#{#idHistorico}")
-	void deleteByIdHistorico(@Param("idHistorico") Long idHistorico);
+	@Query("DELETE FROM MaletaAtual MA WHERE MA.idMaletaAtual.idVendedor = :#{#id}")
+	void deleteByVendedorId(@Param("id") Long id);
 }

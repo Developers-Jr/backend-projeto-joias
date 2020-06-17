@@ -96,10 +96,6 @@ public class ProdutoController {
 	 * @param result
 	 */
 	public void validarProdutoExistente(Long id) {
-		Optional<Produto> produto = produtoService.buscarPorId(id);
-		
-		if(!produto.isPresent()) {
-			throw new NotFoundException();
-		}
+		produtoService.buscarPorId(id).orElseThrow(() -> new NotFoundException("Produto não encontrado!"));
 	}
 }
