@@ -21,15 +21,18 @@ public class MaletaAtual {
 	public MaletaAtual() {}
 	
 	public MaletaAtual(MaletaAtualId id, List<Produto> produtos) {
-		this.valor = converterProdutoValor(produtos);
+		this.valorRestante = converterProdutoValor(produtos);
 		this.idMaletaAtual = id;
 	}
 
 	@EmbeddedId
 	private MaletaAtualId idMaletaAtual;
 	
-	@Column(name = "valor")
-	private double valor;
+	@Column(name = "valor_restante")
+	private double valorRestante;
+	
+	@Column(name = "valor_vendido")
+	private double valorVendido;
 	
 	@Column(name = "fechada")
 	private boolean fechada;

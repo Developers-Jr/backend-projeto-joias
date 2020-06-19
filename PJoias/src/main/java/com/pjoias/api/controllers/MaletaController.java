@@ -84,7 +84,7 @@ public class MaletaController {
 	 * @return ResponseEntity<Response<List<MaletaDTO>>>
 	 */
 	@GetMapping("admin/maletas")
-	public ResponseEntity<Response<List<MaletaDTO>>> listarTodas(Authentication authentication) {
+	public ResponseEntity<Response<List<MaletaDTO>>> listarTodas() {
 		Response<List<MaletaDTO>> response = new Response<>();
 		List<MaletaDTO> maletas = maletaService.buscarTodos()
 												.stream()
@@ -131,11 +131,13 @@ public class MaletaController {
 	public ResponseEntity<Response<List<MaletaDTO>>> buscarMaletasPorVendedor(@RequestParam("vendedor") Long vendedorId) {
 		Response<List<MaletaDTO>> response = new Response<>();
 		List<Maleta> maletas = maletaService.buscarPorIdVendedor(vendedorId);
-		
 		List<MaletaDTO> listMaletaDto = maletas.stream().map(m -> new MaletaDTO(m)).collect(Collectors.toList());
+		
+		listMaletaDto.stream().forEach(mdto -> this.setValorVendido(mdto, vendedorId));
 		response.setData(listMaletaDto);
 		return ResponseEntity.ok(response);
 	}
+	
 	
 	/**
 	 * Deleta maleta de acordo com admin
@@ -218,11 +220,30 @@ public class MaletaController {
 		return ResponseEntity.badRequest().body(response);
 	}
 	
+	/**
+	 * Valida o nome da maleta
+	 * 
+	 * @param nome
+	 * @param result
+	 */
 	private void validarNomeMaleta(String nome, BindingResult result) {
 		Optional<Maleta> maleta = maletaService.buscarPorNome(nome);
 		
 		if(maleta.isPresent()) {
 			result.addError(new ObjectError("maletaExistente", "Já existe uma maleta com esse nome"));
 		}
+	}
+	
+	/**
+	 * Define o valor vendido para o DTO 
+	 * 
+	 * @param maletaDto
+	 * @param vendedorId
+	 */
+	private void setValorVendido(MaletaDTO maletaDto, Long vendedorId) {
+		MaletaAtual maletaAtual = maletaAtualService.buscarPorId(new MaletaAtualId(vendedorId, maletaDto.getId()))
+							.orElseThrow(() -> new NotFoundException("Alguma maleta não foi encontrada!"));
+		
+		maletaDto.setValorVendido(maletaAtual.getValorVendido());
 	}
 }

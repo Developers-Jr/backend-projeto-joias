@@ -61,6 +61,16 @@ create table historico(
 		references vendedor(id)
 );
 
+create table maleta(
+	id bigint primary key auto_increment not null, 
+    nome varchar(100) not null,
+    fechada boolean default false,
+    id_admin bigint not null,
+    constraint fk_id_admin
+    foreign key(id_admin)
+		references admin(id)
+);
+
 create table maleta_atual_vendedor(
     id_vendedor bigint not null,
     constraint fk_id_vendedor_maleta_atual
@@ -70,10 +80,12 @@ create table maleta_atual_vendedor(
     constraint fk_id_maleta_atual_vendedor
     foreign key(id_maleta)
 		references maleta(id),
-	valor decimal default 0.00,
+	valor_restante decimal default 0.00,
+    valor_vendido decimal default 0.00,
     fechada boolean default false,
 	primary key(id_vendedor, id_maleta)
 );
+
 
 create table maleta_historico(
 	id bigint primary key auto_increment not null, 
@@ -88,17 +100,6 @@ create table maleta_historico(
 	valor decimal not null default 0.00
 );
 
-create table maleta(
-	id bigint primary key auto_increment not null, 
-    nome varchar(100) not null,
-    fechada boolean default false,
-    id_admin bigint not null,
-    constraint fk_id_admin
-    foreign key(id_admin)
-		references admin(id)
-);
-
-
 create table produto(
 	id bigint primary key auto_increment not null,  
     nome varchar(100) not null,
@@ -112,6 +113,7 @@ create table produto(
 select * from maleta_atual_vendedor;
 select * from maleta_historico;
 
-insert into admin(nome, email, sobrenome) values ('caio', 'caio.ds.2003@gmail.com', 'mello');
-insert into user_login(nome, email, senha, admin) values ('caio', 'caio.ds.2003@gmail.com', '$2y$12$8WaWnP9zgDeoKzu2d.UcVO2V8XXRZovsfdL3HaUdRZceRLlmZuiwO', true);
+select * from admin;
+insert into admin(nome, email, sobrenome) values ('caio', 'caio@gmail.com', 'mello');
+insert into user_login(nome, email, senha, admin) values ('caio', 'caio@gmail.com', '$2y$12$8WaWnP9zgDeoKzu2d.UcVO2V8XXRZovsfdL3HaUdRZceRLlmZuiwO', true);
 

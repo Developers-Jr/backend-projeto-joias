@@ -65,6 +65,7 @@ public class VendedorController {
 	@Autowired
 	private MaletaAtualService maletaAtualService;
 	
+	
 	/**
 	 * Lista todos os vendedores 
 	 * 
@@ -214,6 +215,7 @@ public class VendedorController {
 		
 		return ResponseEntity.noContent().build();
 	}	
+	
 	
 	/**
 	 * Valida email, verificando se este ja possui cadastro

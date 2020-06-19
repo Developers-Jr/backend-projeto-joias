@@ -47,7 +47,7 @@ public class Maleta {
 	
 	public Maleta(MaletaDTO maletaDto) {
 		this.nome = maletaDto.getNome();
-		this.valor = maletaDto.getValor();
+		this.valor = maletaDto.getValorRestante();
 		this.fechada = maletaDto.isFechada();
 	}
 }

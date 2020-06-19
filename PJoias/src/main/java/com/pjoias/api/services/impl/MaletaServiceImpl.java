@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.pjoias.api.models.entities.Maleta;
-import com.pjoias.api.models.entities.MaletaAtual;
 import com.pjoias.api.repositories.MaletaRepository;
 import com.pjoias.api.services.MaletaService;
 

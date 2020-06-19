@@ -19,7 +19,9 @@ public class MaletaDTO {
 	@NotNull(message = "O nome da maleta não pode estar vazio")
 	private String nome;
 	
-	private double valor;
+	private double valorRestante;
+	
+	private double valorVendido;
 	
 	private boolean fechada;
 	
@@ -32,7 +34,7 @@ public class MaletaDTO {
 	public MaletaDTO(Maleta maleta) {
 		this.id = maleta.getId();
 		this.nome = maleta.getNome();
-		this.valor = maleta.getProdutos() != null ? this.calcularValorTotalProduto(maleta.getProdutos()) : 0.0;
+		this.valorRestante = maleta.getProdutos() != null ? this.calcularValorTotalProduto(maleta.getProdutos()) : 0.0;
 		this.fechada = maleta.isFechada();
 		this.produtos = maleta.getProdutos();
 		this.id_admin = maleta.getId_admin();
