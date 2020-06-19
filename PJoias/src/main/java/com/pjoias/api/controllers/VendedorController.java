@@ -1,8 +1,8 @@
 package com.pjoias.api.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -29,6 +29,7 @@ import com.pjoias.api.models.entities.Maleta;
 import com.pjoias.api.models.entities.MaletaAtual;
 import com.pjoias.api.models.entities.MaletaAtualId;
 import com.pjoias.api.models.entities.MaletaHistorico;
+import com.pjoias.api.models.entities.Produto;
 import com.pjoias.api.models.users.UserLogin;
 import com.pjoias.api.models.users.Vendedor;
 import com.pjoias.api.services.AdminService;
@@ -74,13 +75,19 @@ public class VendedorController {
 	@GetMapping("admin/vendedores")
 	public ResponseEntity<Response<List<VendedorDTO>>> listarTodos(Authentication authentication) {
 		Response<List<VendedorDTO>> response = new Response<>();
-		List<VendedorDTO> vendedores = vendedorService.buscarTodos().stream()
-				.map(v -> new VendedorDTO(v, this.calculaValorMaletas(v.getId())))
-				.collect(Collectors.toList());
+		List<VendedorDTO> vendedoresDto = new ArrayList<>();
 		
+		List<Vendedor> vendedores = vendedorService.buscarTodos();
+		for(Vendedor vendedor : vendedores) {
+			double valorTotal = this.calculaValorMaletas(vendedor);
+			
+			VendedorDTO vendedorDto = new VendedorDTO(vendedor);
+			vendedorDto.setValorTotalMaletas(valorTotal);
+			
+			vendedoresDto.add(vendedorDto);
+		}
 		
-		
-		response.setData(vendedores);
+		response.setData(vendedoresDto);
 		return ResponseEntity.ok(response);
 	}
 	
@@ -115,7 +122,7 @@ public class VendedorController {
 		Vendedor vendedor = vendedorService.persistir(new Vendedor(vendedorDto));
 		historicoService.persistir(new Historico(vendedor.getId()));
 		loginService.persist(new UserLogin(vendedorDto.getNome(), vendedorDto.getEmail(), PasswordEncoder.encode(vendedorDto.getSenha()), false));
-		response.setData(new VendedorDTO(vendedor, 0.0));
+		response.setData(new VendedorDTO(vendedor));
 		return ResponseEntity.ok(response);
 	}
 	
@@ -128,7 +135,10 @@ public class VendedorController {
 	@GetMapping("admin/vendedores/{id}")
 	public ResponseEntity<VendedorDTO> buscarPorId(@PathVariable("id") Long id) {
 		Vendedor vendedor = vendedorService.buscarPorId(id).orElseThrow(() -> new NotFoundException("Vendedor não encontrado!"));
-		return ResponseEntity.ok(new VendedorDTO(vendedor, this.calculaValorMaletas(vendedor.getId())));
+		VendedorDTO vendedorDto = new VendedorDTO(vendedor);
+		
+		vendedorDto.setValorTotalMaletas(this.calculaValorMaletas(vendedor));
+		return ResponseEntity.ok(vendedorDto);
 	}
 	
 	/**
@@ -157,7 +167,7 @@ public class VendedorController {
 		}
 		
 		vendedorService.persistir(vendedor);
-		response.setData(new VendedorDTO(vendedor, this.calculaValorMaletas(vendedor.getId())));
+		response.setData(new VendedorDTO(vendedor));
 		
 		return ResponseEntity.ok(response);
 	}
@@ -269,12 +279,21 @@ public class VendedorController {
 	}
 	
 	/**
-	 * Busca e retorna o total do valor da soma de cada maleta atribuida a esse vendedor
+	 * Calcula o valor das maletas de um vendedor
 	 * 
-	 * @param id
-	 * @return
+	 * @param vendedor
+	 * @return double
 	 */
-	private double calculaValorMaletas(Long id) {
-		return 1;
+	private double calculaValorMaletas(Vendedor vendedor) {
+		double valorTotal = 0.0;
+		List<Maleta> maletas = maletaService.buscarPorIdVendedor(vendedor.getId());
+		
+		for(Maleta maleta : maletas) {
+			for(Produto produto : maleta.getProdutos()) {
+				valorTotal = produto.getValor() + valorTotal;
+			}
+		}
+		
+		return valorTotal;
 	}
 }
