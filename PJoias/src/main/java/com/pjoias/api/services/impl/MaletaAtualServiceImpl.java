@@ -35,4 +35,9 @@ public class MaletaAtualServiceImpl implements MaletaAtualService {
 	public Optional<MaletaAtual> buscarPorId(MaletaAtualId id) {
 		return maletaAtualRepository.findById(id);
 	}
+
+	@Override
+	public Optional<MaletaAtual> buscarPorMaleta(Long id) {
+		return maletaAtualRepository.findByMaleta(id);
+	}
 }

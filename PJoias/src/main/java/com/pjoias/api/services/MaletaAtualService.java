@@ -13,4 +13,6 @@ public interface MaletaAtualService {
 	void deletarPorIdVendedor(Long id);
 	
 	Optional<MaletaAtual> buscarPorId(MaletaAtualId id);
+	
+	Optional<MaletaAtual> buscarPorMaleta(Long id);
 }

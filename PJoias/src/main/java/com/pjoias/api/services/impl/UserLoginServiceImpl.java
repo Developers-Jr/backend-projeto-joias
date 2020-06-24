@@ -16,22 +16,22 @@ public class UserLoginServiceImpl implements UserLoginService {
 	private UserLoginRepository loginRepository;
 	
 	@Override
-	public UserLogin persist(UserLogin userLogin) {
+	public UserLogin persistir(UserLogin userLogin) {
 		return loginRepository.save(userLogin);
 	}
 
 	@Override
-	public Optional<UserLogin> findByEmail(String email) {
+	public Optional<UserLogin> buscarPorEmail(String email) {
 		return loginRepository.findByEmail(email);
 	}
 
 	@Override
-	public Optional<UserLogin> findById(Long id) {
+	public Optional<UserLogin> buscarPorId(Long id) {
 		return loginRepository.findById(id);
 	}
 
 	@Override
-	public void deleteById(Long id) {
+	public void deletarPorId(Long id) {
 		loginRepository.deleteById(id);
 	}
 

@@ -3,10 +3,12 @@ package com.pjoias.api.controllers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.pjoias.api.dtos.MaletaHistoricoDTO;
 import com.pjoias.api.dtos.Response;
 import com.pjoias.api.dtos.VendedorDTO;
 import com.pjoias.api.exceptions.NotFoundException;
@@ -66,12 +69,6 @@ public class VendedorController {
 	@Autowired
 	private MaletaAtualService maletaAtualService;
 	
-	
-	/**
-	 * Lista todos os vendedores 
-	 * 
-	 * @return ResponseEntity<Response<List<VendedorDTO>>>
-	 */
 	@GetMapping("admin/vendedores")
 	public ResponseEntity<Response<List<VendedorDTO>>> listarTodos(Authentication authentication) {
 		Response<List<VendedorDTO>> response = new Response<>();
@@ -91,14 +88,33 @@ public class VendedorController {
 		return ResponseEntity.ok(response);
 	}
 	
-	/**
-	 * Cadastra um novo vendedor 
-	 * 
-	 * @param vendedorDto
-	 * @param result
-	 * @param authentication
-	 * @return ResponseEntity<Response<VendedorDTO>>
-	 */
+	@GetMapping("admin/vendedores/{id}")
+	public ResponseEntity<Response<VendedorDTO>> buscarPorId(@PathVariable("id") Long id) {
+		Response<VendedorDTO> response = new Response<>();
+		Vendedor vendedor = vendedorService.buscarPorId(id).orElseThrow(() -> new NotFoundException("Vendedor não encontrado!"));
+		VendedorDTO vendedorDto = new VendedorDTO(vendedor);
+		
+		vendedorDto.setValorTotalMaletas(this.calculaValorMaletas(vendedor));
+		response.setData(vendedorDto);
+		return ResponseEntity.ok(response);
+	}
+	
+	@GetMapping("admin/vendedores/historico/{id}")
+	public ResponseEntity<Response<List<MaletaHistoricoDTO>>> buscarHistoricoPorIdVendedor(@PathVariable("id") Long idVendedor) {
+		Response<List<MaletaHistoricoDTO>> response = new Response<>();
+		
+		vendedorService.buscarPorId(idVendedor).orElseThrow(() -> new NotFoundException("Vendedor não encontrado!"));
+		
+		List<MaletaHistorico> maletaHistorico = maletaHistoricoService.buscarPorIdVendedor(idVendedor);
+		List<MaletaHistoricoDTO> maletaHistoricoDto = maletaHistorico.stream()
+																		.map(mh -> new MaletaHistoricoDTO(mh))
+																		.collect(Collectors.toList()); 
+		
+		response.setData(maletaHistoricoDto);
+		return ResponseEntity.ok(response);
+	}
+	
+	
 	@PostMapping("admin/vendedores")
 	public ResponseEntity<Response<VendedorDTO>> persistir(@Valid @RequestBody VendedorDTO vendedorDto, BindingResult result, Authentication authentication) {
 		Response<VendedorDTO> response = new Response<>();
@@ -121,34 +137,39 @@ public class VendedorController {
 		
 		Vendedor vendedor = vendedorService.persistir(new Vendedor(vendedorDto));
 		historicoService.persistir(new Historico(vendedor.getId()));
-		loginService.persist(new UserLogin(vendedorDto.getNome(), vendedorDto.getEmail(), PasswordEncoder.encode(vendedorDto.getSenha()), false));
+		loginService.persistir(new UserLogin(vendedorDto.getNome(), vendedorDto.getEmail(), PasswordEncoder.encode(vendedorDto.getSenha()), false));
 		response.setData(new VendedorDTO(vendedor));
 		return ResponseEntity.ok(response);
 	}
 	
-	/**
-	 * Busca um vendedor por seu id
-	 * 
-	 * @param id
-	 * @return ResponseEntity<VendedorDTO>
-	 */
-	@GetMapping("admin/vendedores/{id}")
-	public ResponseEntity<VendedorDTO> buscarPorId(@PathVariable("id") Long id) {
-		Vendedor vendedor = vendedorService.buscarPorId(id).orElseThrow(() -> new NotFoundException("Vendedor não encontrado!"));
-		VendedorDTO vendedorDto = new VendedorDTO(vendedor);
+	@PostMapping("admin/vendedores/vendedor")
+	public ResponseEntity<Void> atribuirMaleta(@RequestParam(name = "vendedor") Long vendedorId, 
+															@RequestParam(name = "maleta") Long maletaId) {
 		
-		vendedorDto.setValorTotalMaletas(this.calculaValorMaletas(vendedor));
-		return ResponseEntity.ok(vendedorDto);
+		vendedorService.buscarPorId(vendedorId)
+											.orElseThrow(() -> new NotFoundException("Vendedor não encontrado!"));
+		
+		Maleta maleta = maletaService.buscarPorId(maletaId)
+										.orElseThrow(() -> new NotFoundException("Maleta não encontrada!"));
+		
+		Historico historico = historicoService.buscarPorIdVendedor(vendedorId)
+												.orElseThrow(() -> new NotFoundException("Este vendedor não possui histórico!"));
+		
+		if(maletaAtualService.buscarPorMaleta(maletaId).isPresent()) {
+			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+		}
+		
+		MaletaAtualId id = new MaletaAtualId(vendedorId, maletaId);
+		MaletaAtual maletaAtual = new MaletaAtual(id, maleta.getProdutos());
+		
+		maletaHistoricoService.persistir(new MaletaHistorico(historico.getId(),
+											maleta.getId(), maleta.getProdutos()));
+		
+		maletaAtualService.persistir(maletaAtual);
+		return ResponseEntity.accepted().build();
+
 	}
 	
-	/**
-	 * Atualiza os dados de um vendedor 
-	 * 
-	 * @param vendedorDTO
-	 * @param id
-	 * @param result
-	 * @return ResponseEntity<Response<VendedorDTO>>
-	 */
 	@PutMapping("admin/vendedores/{id}")
 	public ResponseEntity<Response<VendedorDTO>> atualizar(@Valid @RequestBody VendedorDTO vendedorDTO, 
 													@PathVariable("id") Long id, BindingResult result) {
@@ -157,7 +178,7 @@ public class VendedorController {
 		Vendedor vendedor = vendedorService.buscarPorId(id)
 												.orElseThrow(() -> new NotFoundException("Vendedor não encontrado!"));
 		
-		UserLogin loginVendedor = loginService.findByEmail(vendedor.getEmail()).get();
+		UserLogin loginVendedor = loginService.buscarPorEmail(vendedor.getEmail()).get();
 		
 		this.atualizarVendedor(vendedorDTO, vendedor, result, loginVendedor);
 		if(result.hasErrors()) {
@@ -171,94 +192,47 @@ public class VendedorController {
 		
 		return ResponseEntity.ok(response);
 	}
- 	
-	/**
-	 * Atribuindo maleta ao histórico do vendedor
-	 * 
-	 * @param vendedorId
-	 * @param maletaId
-	 * @return ResponseEntity<Void>
-	 */
-	@PostMapping("admin/vendedores/vendedor")
-	public ResponseEntity<Void> atribuirMaleta(@RequestParam(name = "vendedorId") Long vendedorId, 
-															@RequestParam(name = "maletaId") Long maletaId) {
+	
+	@DeleteMapping("admin/vendedores")
+	public ResponseEntity<Void> retirarMaletaDoVendedor(@RequestParam("maleta") Long idMaleta, 
+											@RequestParam("vendedor") Long idVendedor) {
+		MaletaAtualId maletaAtualId = new MaletaAtualId(idVendedor, idMaleta);
+		maletaAtualService.buscarPorId(maletaAtualId)
+													.orElseThrow(() -> new NotFoundException("Essa atribuição não foi feita!"));
 		
-		Vendedor vendedor = vendedorService.buscarPorId(vendedorId)
-											.orElseThrow(() -> new NotFoundException("Vendedor não encontrado!"));
-		
-		Maleta maleta = maletaService.buscarPorId(maletaId)
-										.orElseThrow(() -> new NotFoundException("Maleta não encontrada!"));
-		
-		Historico historico = historicoService.buscarPorIdVendedor(vendedorId)
-												.orElseThrow(() -> new NotFoundException("Este vendedor não possui histórico!"));
-		
-		
-		MaletaAtualId id = new MaletaAtualId(vendedor.getId(), maleta.getId());
-		MaletaAtual maletaAtual = new MaletaAtual(id, maleta.getProdutos());
-		
-		maletaHistoricoService.persistir(new MaletaHistorico(historico.getId(),
-											maleta.getId(), maleta.getProdutos()));
-		
-		maletaAtualService.persistir(maletaAtual);
-		return ResponseEntity.accepted().build();
-
+		maletaAtualService.deletar(maletaAtualId);
+		return ResponseEntity.noContent().build();
 	}
 	
-	/**
-	 * Deleta um vendedor de acordo com seu id
-	 * 
-	 * @param id
-	 * @return ResponseEntity<Void>
-	 */
 	@DeleteMapping("admin/vendedores/{id}")
 	public ResponseEntity<Void> deletarPorId(@PathVariable("id") Long id) throws NotFoundException {
 		Vendedor vendedor = vendedorService.buscarPorId(id).orElseThrow(() -> new NotFoundException("Vendedor não encontrado!"));
 		
-		Optional<UserLogin> login = loginService.findByEmail(vendedor.getEmail());
+		Optional<UserLogin> login = loginService.buscarPorEmail(vendedor.getEmail());
 		Optional<Historico> historico = historicoService.buscarPorIdVendedor(id);
 
 		maletaAtualService.deletarPorIdVendedor(vendedor.getId());
 		maletaHistoricoService.deletarPorIdHistorico(historico.get().getId());
 		historicoService.deletarPorId(historico.get().getId());
-		loginService.deleteById(login.get().getId());
+		loginService.deletarPorId(login.get().getId());
 		vendedorService.deletarPorId(id);
 		
 		return ResponseEntity.noContent().build();
 	}	
 	
 	
-	/**
-	 * Valida email, verificando se este ja possui cadastro
-	 * 
-	 * @param email
-	 * @param result
-	 */
 	private void verificarEmailExistente(String email, BindingResult result) {
 		vendedorService.buscarPorEmail(email)
 			.ifPresent(erro -> result.addError(new ObjectError("emailInvalido", "Este email já foi cadastrado!")));
 		
 	}
 	
-	/**
-	 * Verificar telefone, caso haja cadastro torna invalido o registro 
-	 * 
-	 * @param telefone
-	 * @param result
-	 */
 	private void verificarTelefoneExistente(String telefone, BindingResult result) {
 		vendedorService.buscarPorTelefone(telefone)
 			.ifPresent(erro -> result.addError(new ObjectError("telefoneExistente", "Este telefone já foi cadastrado!")));
 		
 	}
 	
-	/**
-	 * Logica de negocio para atualizacao de vendedor 
-	 * 
-	 * @param vendedorDTO
-	 * @param vendedor
-	 * @param result
-	 * @param login
-	 */
 	private void atualizarVendedor(VendedorDTO vendedorDTO, Vendedor vendedor, BindingResult result, UserLogin login) {
 		if(!vendedorDTO.getEmail().equals(vendedor.getEmail())) {
 			this.verificarEmailExistente(vendedorDTO.getEmail(), result);
@@ -278,12 +252,6 @@ public class VendedorController {
 		}
 	}
 	
-	/**
-	 * Calcula o valor das maletas de um vendedor
-	 * 
-	 * @param vendedor
-	 * @return double
-	 */
 	private double calculaValorMaletas(Vendedor vendedor) {
 		double valorTotal = 0.0;
 		List<Maleta> maletas = maletaService.buscarPorIdVendedor(vendedor.getId());

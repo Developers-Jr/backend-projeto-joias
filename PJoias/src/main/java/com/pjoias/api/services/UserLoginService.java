@@ -5,11 +5,11 @@ import java.util.Optional;
 import com.pjoias.api.models.users.UserLogin;
 
 public interface UserLoginService {
-	UserLogin persist(UserLogin userLogin);
+	UserLogin persistir(UserLogin userLogin);
 	
-	Optional<UserLogin> findByEmail(String email);
+	Optional<UserLogin> buscarPorEmail(String email);
 	
-	Optional<UserLogin> findById(Long id);
+	Optional<UserLogin> buscarPorId(Long id);
 	
-	void deleteById(Long id);
+	void deletarPorId(Long id);
 }

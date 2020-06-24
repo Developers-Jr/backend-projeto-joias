@@ -1,5 +1,7 @@
 package com.pjoias.api.services.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,12 @@ public class MaletaHistoricoServiceImpl implements MaletaHistoricoService {
 	@Override
 	public MaletaHistorico persistir(MaletaHistorico maletaHistorico) {
 		return maletaHistoricoRepository.save(maletaHistorico);
+	}
+
+
+	@Override
+	public List<MaletaHistorico> buscarPorIdVendedor(Long idVendedor) {
+		return maletaHistoricoRepository.findByIdVendedor(idVendedor);
 	}
 
 }
