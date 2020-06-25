@@ -88,7 +88,7 @@ public class ProdutoController {
 	 * @param id
 	 * @return ResponseEntity<Void>
 	 */
-	@DeleteMapping("vendedores/produtos/{id}")
+	@DeleteMapping("vendedor/produtos/{id}")
 	public ResponseEntity<Void> deletarProdutoVendedor(@PathVariable("id") Long id, Authentication auth) {
 		Produto produto = produtoService.buscarPorId(id)
 										.orElseThrow(() -> new NotFoundException("Produto inexistente!"));

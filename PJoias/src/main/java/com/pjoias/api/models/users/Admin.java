@@ -15,9 +15,11 @@ import org.hibernate.annotations.GenericGenerator;
 
 import com.pjoias.api.models.entities.Maleta;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name="admin")
 public class Admin extends User{
