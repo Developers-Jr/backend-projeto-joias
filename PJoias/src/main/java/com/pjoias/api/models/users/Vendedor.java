@@ -6,12 +6,9 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.GenericGenerator;
 
 import com.pjoias.api.dtos.VendedorDTO;
@@ -37,9 +34,7 @@ public class Vendedor extends User{
 	@Column(name = "id_admin")
 	private Long idAdmin;
 	
-	@OneToMany
-	@JoinColumn(name = "id_vendedor")
-	@Cascade(CascadeType.ALL)
+	@OneToMany(orphanRemoval = true, mappedBy = "idVendedor")
 	private List<Revendedor> revendedor;
 	
 	public Vendedor() {}

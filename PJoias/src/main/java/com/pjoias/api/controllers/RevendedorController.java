@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -69,5 +71,21 @@ public class RevendedorController {
 		return ResponseEntity.ok(response);
 	}
 	
+	
+	@DeleteMapping("vendedor/revendedores/{id}")
+	public ResponseEntity<Void> deletarRevendedorPor(@PathVariable("id") Long idRevendedor, Authentication auth) {
+		Vendedor vendedor = vendedorService.buscarPorEmail(auth.getName())
+											.orElseThrow(() -> new NotFoundException("Você não possui permissão para isto!"));
+		
+		Revendedor revendedor = revendedorService.buscarPor(idRevendedor)
+													.orElseThrow(() -> new NotFoundException("Revendedor inexistente!"));
+		
+		if(revendedor.getIdVendedor() == vendedor.getId()) {
+			revendedorService.excluirRevendedorPorId(idRevendedor);
+			return ResponseEntity.noContent().build();
+		}
+		
+		return ResponseEntity.badRequest().build();
+	}
 	
 }

@@ -2,7 +2,6 @@ package com.pjoias.api.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -208,13 +207,15 @@ public class VendedorController {
 	public ResponseEntity<Void> deletarPorId(@PathVariable("id") Long id) throws NotFoundException {
 		Vendedor vendedor = vendedorService.buscarPorId(id).orElseThrow(() -> new NotFoundException("Vendedor não encontrado!"));
 		
-		Optional<UserLogin> login = loginService.buscarPorEmail(vendedor.getEmail());
-		Optional<Historico> historico = historicoService.buscarPorIdVendedor(id);
-
+		UserLogin login = loginService.buscarPorEmail(vendedor.getEmail())
+												.orElseThrow(() -> new NotFoundException("Login inexistente para este usuário!"));
+		
+		Historico historico = historicoService.buscarPorIdVendedor(id)
+														.orElseThrow(() -> new NotFoundException("Histórico inexistente para este usuário!"));
 		maletaAtualService.deletarPorIdVendedor(vendedor.getId());
-		maletaHistoricoService.deletarPorIdHistorico(historico.get().getId());
-		historicoService.deletarPorId(historico.get().getId());
-		loginService.deletarPorId(login.get().getId());
+		maletaHistoricoService.deletarPorIdHistorico(historico.getId());
+		historicoService.deletarPorId(historico.getId());
+		loginService.deletarPorId(login.getId());
 		vendedorService.deletarPorId(id);
 		
 		return ResponseEntity.noContent().build();

@@ -1,6 +1,7 @@
 package com.pjoias.api.services.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,11 @@ public class RevendedorServiceImpl implements RevendedorService {
 	@Override
 	public List<Revendedor> buscarTodosPor(Long idVendedor) {
 		return revendedorRepository.findByVendedorId(idVendedor);
+	}
+
+	@Override
+	public Optional<Revendedor> buscarPor(Long idRevendedor) {
+		return revendedorRepository.findById(idRevendedor);
 	}
 
 }
