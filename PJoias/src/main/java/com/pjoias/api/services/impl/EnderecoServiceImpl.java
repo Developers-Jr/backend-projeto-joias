@@ -1,5 +1,7 @@
 package com.pjoias.api.services.impl;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +21,13 @@ public class EnderecoServiceImpl implements EnderecoService {
 	}
 
 	@Override
-	public void excluirPor(Long idRevendedor) {
-		enderecoRepository.deleteByIdRevendedor(idRevendedor);
+	public void excluirPor(Long idEndereco) {
+		enderecoRepository.deleteById(idEndereco);
+	}
+
+	@Override
+	public Optional<Endereco> buscarPor(Long idRevendedor) {
+		return enderecoRepository.findByIdRevendedor(idRevendedor);
 	}
 
 }

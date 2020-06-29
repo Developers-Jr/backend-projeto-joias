@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.pjoias.api.dtos.EnderecoDTO;
 import com.pjoias.api.dtos.Response;
 import com.pjoias.api.dtos.RevendedorDTO;
 import com.pjoias.api.exceptions.NotFoundException;
@@ -49,7 +50,7 @@ public class RevendedorController {
 		
 		List<Revendedor> revendedores = revendedorService.buscarTodosPor(idVendedor);
 		List<RevendedorDTO> revendedoresDto = revendedores.stream()
-															.map(r -> new RevendedorDTO(r))
+															.map(r -> this.criarDtoComEndereco(r))
 															.collect(Collectors.toList());
 		response.setData(revendedoresDto);
 		return ResponseEntity.ok(response);
@@ -82,7 +83,6 @@ public class RevendedorController {
 		
 		enderecoService.persistir(endereco);
 		
-		
 		response.setData(new RevendedorDTO(revendedor));
 		return ResponseEntity.ok(response);
 	}
@@ -96,12 +96,27 @@ public class RevendedorController {
 		Revendedor revendedor = revendedorService.buscarPor(idRevendedor)
 													.orElseThrow(() -> new NotFoundException("Revendedor inexistente!"));
 		
+		Endereco endereco = enderecoService.buscarPor(revendedor.getId())
+											.orElseThrow(() -> new NotFoundException("Problema com o endereco! Contate um admin"));
+		
 		if(revendedor.getIdVendedor() == vendedor.getId()) {
+			enderecoService.excluirPor(endereco.getId());
 			revendedorService.excluirRevendedorPorId(idRevendedor);
 			return ResponseEntity.noContent().build();
 		}
 		
 		return ResponseEntity.badRequest().build();
+	}
+	
+	private RevendedorDTO criarDtoComEndereco(Revendedor revendedor) {
+		Endereco endereco = enderecoService.buscarPor(revendedor.getId())
+											.orElseThrow(() -> new NotFoundException("Revendedor " + revendedor.getId() + " sem endereço, contate um admin"));
+		
+		EnderecoDTO enderecoDto = new EnderecoDTO(endereco);
+		RevendedorDTO revendedorDto = new RevendedorDTO(revendedor);
+		
+		revendedorDto.setEndereco(enderecoDto);
+		return revendedorDto;
 	}
 	
 }
