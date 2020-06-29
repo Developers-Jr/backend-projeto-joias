@@ -29,6 +29,9 @@ public class RevendedorDTO {
 	@NotNull(message = "Insira o valor do RG")
 	private String rg;
 	
+	@NotNull(message = "O revendedor deve possuir um endereço")
+	private EnderecoDTO endereco;
+	
 	public RevendedorDTO() {}
 	
 	public RevendedorDTO(Revendedor revendedor) {
@@ -37,5 +40,6 @@ public class RevendedorDTO {
 		this.telefone = revendedor.getTelefone();
 		this.cpf = revendedor.getCpf();
 		this.rg = revendedor.getRg();
+		this.endereco = revendedor.getEndereco();
 	}
 }

@@ -40,6 +40,8 @@ create table revendedor(
 		references vendedor(id)
 );
 
+select * from revendedor;
+
 create table endereco(
 	cod_endereco bigint primary key auto_increment not null,  
 	estado varchar(100) not null,
@@ -112,6 +114,9 @@ create table produto(
 
 select * from maleta_atual_vendedor;
 select * from maleta_historico;
+
+select * from vendedor;
+select * from revendedor;
 
 select * from admin;
 insert into admin(nome, email, sobrenome) values ('caio', 'caio@gmail.com', 'mello');

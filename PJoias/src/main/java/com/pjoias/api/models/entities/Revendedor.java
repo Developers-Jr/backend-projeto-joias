@@ -5,9 +5,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import com.pjoias.api.dtos.EnderecoDTO;
 import com.pjoias.api.dtos.RevendedorDTO;
 
 import lombok.Getter;
@@ -38,6 +40,9 @@ public class Revendedor {
 	@Column(name = "id_vendedor")
 	private Long idVendedor;
 	
+	@Transient
+	private EnderecoDTO endereco;
+	
 	public Revendedor() {}
 	
 	public Revendedor(RevendedorDTO revendedorDto) {
@@ -46,5 +51,6 @@ public class Revendedor {
 		this.telefone = revendedorDto.getTelefone();
 		this.cpf = revendedorDto.getCpf();
 		this.rg = revendedorDto.getRg();
+		this.endereco = revendedorDto.getEndereco();
 	}
 }

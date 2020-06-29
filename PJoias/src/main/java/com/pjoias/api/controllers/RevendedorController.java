@@ -20,8 +20,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.pjoias.api.dtos.Response;
 import com.pjoias.api.dtos.RevendedorDTO;
 import com.pjoias.api.exceptions.NotFoundException;
+import com.pjoias.api.models.entities.Endereco;
 import com.pjoias.api.models.entities.Revendedor;
 import com.pjoias.api.models.users.Vendedor;
+import com.pjoias.api.services.EnderecoService;
 import com.pjoias.api.services.RevendedorService;
 import com.pjoias.api.services.VendedorService;
 
@@ -34,6 +36,9 @@ public class RevendedorController {
 	
 	@Autowired
 	private VendedorService vendedorService;
+	
+	@Autowired
+	private EnderecoService enderecoService;
 	
 	@GetMapping("vendedor/revendedores")
 	public ResponseEntity<Response<List<RevendedorDTO>>> listarRevendedores(Authentication auth) {
@@ -55,7 +60,7 @@ public class RevendedorController {
 																		BindingResult result, Authentication auth) {
 		Response<RevendedorDTO> response = new Response<>();
 		Vendedor vendedor = vendedorService.buscarPorEmail(auth.getName())
-															.orElseThrow(() -> new NotFoundException("Contate um administrador"));
+															.orElseThrow(() -> new NotFoundException("Contate um administrador erro no vendedor"));
 		
 		if(result.hasErrors()) {
 			result.getAllErrors().stream().forEach(e -> response.addError(e.getDefaultMessage()));
@@ -65,7 +70,18 @@ public class RevendedorController {
 		Revendedor revendedor = new Revendedor(revendedorDto);
 		revendedor.setIdVendedor(vendedor.getId());
 		
-		revendedorService.persistir(revendedor);
+		Endereco endereco = new Endereco();
+		endereco.setEstado(revendedorDto.getEndereco().getEstado());
+		endereco.setCidade(revendedorDto.getEndereco().getCidade());
+		endereco.setRua(revendedorDto.getEndereco().getRua());
+		endereco.setNumero(revendedorDto.getEndereco().getNumero());
+		endereco.setCep(revendedorDto.getEndereco().getCep());
+		
+		revendedor = revendedorService.persistir(revendedor);
+		endereco.setIdRevendedor(revendedor.getId());
+		
+		enderecoService.persistir(endereco);
+		
 		
 		response.setData(new RevendedorDTO(revendedor));
 		return ResponseEntity.ok(response);
