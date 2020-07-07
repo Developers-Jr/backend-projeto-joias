@@ -117,6 +117,7 @@ select * from maleta_historico;
 
 select * from vendedor;
 select * from revendedor;
+select * from endereco;
 
 select * from admin;
 insert into admin(nome, email, sobrenome) values ('caio', 'caio@gmail.com', 'mello');
