@@ -1,12 +1,15 @@
 package com.caio.pjoias.models;
 
 import com.caio.pjoias.dtos.VendedorDto;
+import com.caio.pjoias.utils.PasswordUtils;
 import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Objects;
 
 @Getter
+@Setter
 @Table(name = "vendedor")
 @Entity
 public class Vendedor {
@@ -33,7 +36,7 @@ public class Vendedor {
         this.nome = nome;
         this.sobrenome = sobrenome;
         this.email = email;
-        this.senha = senha;
+        this.senha = PasswordUtils.encode(senha);
     }
 
     public Vendedor(VendedorDto dto) {
@@ -41,7 +44,11 @@ public class Vendedor {
         this.nome = dto.getNome();
         this.sobrenome = dto.getSobrenome();
         this.email = dto.getEmail();
-        this.senha = dto.getSenha();
+        this.senha = PasswordUtils.encode(dto.getSenha());
+    }
+
+    public void setSenha(String senha) {
+        this.senha = PasswordUtils.encode(senha);
     }
 
     @Override

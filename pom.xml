@@ -24,6 +24,14 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
+		<!-- Security -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-core</artifactId>
+			<version>5.3.4.RELEASE</version>
+		</dependency>
+
+
 		<!-- Validations -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
