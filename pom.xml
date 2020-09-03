@@ -46,9 +46,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<scope>runtime</scope>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>42.2.16</version>
 		</dependency>
 
 		<dependency>
@@ -67,6 +67,8 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
+
 	</dependencies>
 
 	<build>
@@ -74,6 +76,14 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>dockerfile-maven-plugin</artifactId>
+				<version>1.4.2</version>
+				<configuration>
+					<repository>caioom/${project.artifactId}-app</repository>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

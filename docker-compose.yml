@@ -1,0 +1,14 @@
+version: '3.4'
+services:
+  docker-app:
+    image: caioom/pjoias
+    network_mode: "host"
+    depends_on:
+      - docker-postgres
+  docker-postgres:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=pjoias
+      - POSTGRES_PASSWORD=root
