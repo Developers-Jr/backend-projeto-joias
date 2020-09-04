@@ -1,15 +1,18 @@
 package com.caio.pjoias.controllers;
 
-import com.caio.pjoias.dtos.VendedorDto;
+import com.caio.pjoias.dtos.in.VendedorDtoIn;
+import com.caio.pjoias.dtos.out.VendedorDtoOut;
+import com.caio.pjoias.exceptions.VendedorException;
 import com.caio.pjoias.models.Vendedor;
 import com.caio.pjoias.services.VendedorService;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @RestController
 @RequestMapping("v1/vendedor")
@@ -21,9 +24,18 @@ public class VendedorController {
     }
 
     @PostMapping
-    public HttpStatus cadastrarNovoVendedor(@Valid @RequestBody VendedorDto vendedorDto) {
-        var resultado = this.vendedorService.persistirNovo(new Vendedor(vendedorDto));
-        System.out.println(resultado.toString());
-        return resultado != null ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST;
+    public HttpStatus cadastrarNovoVendedor(@Valid @RequestBody VendedorDtoIn vendedorDtoIn) throws VendedorException {
+        this.vendedorService.persistirNovo(new Vendedor(vendedorDtoIn));
+        return HttpStatus.CREATED;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<VendedorDtoOut>> retornarTodos() {
+        var vendedores = this.vendedorService.retornarTodos()
+                .stream()
+                .map(v -> new VendedorDtoOut(v))
+                .collect(toList());
+
+        return ResponseEntity.ok(vendedores);
     }
 }

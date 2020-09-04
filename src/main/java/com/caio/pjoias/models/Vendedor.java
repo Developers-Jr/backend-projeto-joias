@@ -1,6 +1,6 @@
 package com.caio.pjoias.models;
 
-import com.caio.pjoias.dtos.VendedorDto;
+import com.caio.pjoias.dtos.in.VendedorDtoIn;
 import com.caio.pjoias.utils.PasswordUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,7 +39,7 @@ public class Vendedor {
         this.senha = PasswordUtils.encode(senha);
     }
 
-    public Vendedor(VendedorDto dto) {
+    public Vendedor(VendedorDtoIn dto) {
         this.uid = dto.getUid();
         this.nome = dto.getNome();
         this.sobrenome = dto.getSobrenome();

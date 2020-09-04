@@ -18,6 +18,11 @@ public class VendedorBuilder {
         return builder;
     }
 
+    public VendedorBuilder comUid(String uid) {
+        this.vendedor.setUid(uid);
+        return this;
+    }
+
     public Vendedor agora() {
         return this.vendedor;
     }

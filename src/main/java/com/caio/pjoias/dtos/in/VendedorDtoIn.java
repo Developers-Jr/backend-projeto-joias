@@ -1,4 +1,5 @@
-package com.caio.pjoias.dtos;
+package com.caio.pjoias.dtos.in;
+import com.caio.pjoias.models.Vendedor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,7 +9,7 @@ import javax.validation.constraints.Size;
 
 @Getter
 @Setter
-public class VendedorDto {
+public class VendedorDtoIn {
     @NotEmpty(message = "Uid não pode estar vazio")
     private String uid;
 
