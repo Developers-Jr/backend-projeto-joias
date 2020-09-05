@@ -11,6 +11,7 @@ public class VendedorDtoOut implements Serializable {
     private String nome;
     private String sobrenome;
     private String email;
+    private String telefone;
 
     public VendedorDtoOut() {}
 
@@ -19,5 +20,6 @@ public class VendedorDtoOut implements Serializable {
         this.nome = vendedor.getNome();
         this.sobrenome = vendedor.getSobrenome();
         this.email = vendedor.getEmail();
+        this.telefone = vendedor.getTelefone();
     }
 }

@@ -6,13 +6,15 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 
 @Getter
 @Setter
 @Table(name = "vendedor")
 @Entity
-public class Vendedor {
+public class Vendedor implements Serializable {
     @Id
     @Column(name = "uid")
     private String uid;
@@ -29,22 +31,23 @@ public class Vendedor {
     @Column(name = "senha")
     private String senha;
 
+    @Column(name = "telefone")
+    private String telefone;
+
+    @Transient
+    private GeraUid geraUid = () -> {
+        return UUID.randomUUID().toString();
+    };
+
     public Vendedor() {}
 
-    public Vendedor(String uid, String nome, String sobrenome, String email, String senha) {
-        this.uid = uid;
-        this.nome = nome;
-        this.sobrenome = sobrenome;
-        this.email = email;
-        this.senha = PasswordUtils.encode(senha);
-    }
-
     public Vendedor(VendedorDtoIn dto) {
-        this.uid = dto.getUid();
+        this.uid = dto.getUid() != null ? dto.getUid() : geraUid.gerarUid();
         this.nome = dto.getNome();
         this.sobrenome = dto.getSobrenome();
         this.email = dto.getEmail();
         this.senha = PasswordUtils.encode(dto.getSenha());
+        this.telefone = dto.getTelefone();
     }
 
     public void setSenha(String senha) {
@@ -77,4 +80,9 @@ public class Vendedor {
                 ", senha='" + senha + '\'' +
                 '}';
     }
+}
+
+@FunctionalInterface
+interface GeraUid {
+    String gerarUid();
 }

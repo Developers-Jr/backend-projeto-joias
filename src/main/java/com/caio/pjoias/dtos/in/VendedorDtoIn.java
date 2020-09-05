@@ -1,29 +1,31 @@
 package com.caio.pjoias.dtos.in;
-import com.caio.pjoias.models.Vendedor;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 
 @Getter
 @Setter
-public class VendedorDtoIn {
-    @NotEmpty(message = "Uid não pode estar vazio")
+public class VendedorDtoIn implements Serializable {
     private String uid;
 
-    @NotEmpty(message = "O nome não pode estar vazio")
+    @NotEmpty(message = "Informe um nome")
     private String nome;
 
-    @NotEmpty(message = "O sobrenome não pode estar vazio")
+    @NotEmpty(message = "Informe um sobrenome!")
     private String sobrenome;
 
-    @NotEmpty(message = "O email não pode estar vazio")
+    @NotEmpty(message = "O email é obrigatório")
     @Email(message = "Informe um email válido")
     private String email;
 
-    @NotEmpty(message = "A senha não pode estar vazia")
+    @NotEmpty(message = "A senha é obrigatória")
     @Size(min = 8, message = "A senha deve conter ao menos 8 caractéres")
     private String senha;
+
+    @NotEmpty(message = "O telefone é obrigatório")
+    private String telefone;
 }
