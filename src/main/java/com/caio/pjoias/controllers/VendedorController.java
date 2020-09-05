@@ -7,8 +7,8 @@ import com.caio.pjoias.models.Vendedor;
 import com.caio.pjoias.services.VendedorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import org.apache.coyote.Response;
-import org.springframework.http.HttpStatus;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,10 +39,14 @@ public class VendedorController {
     @Operation(description = "Listar vendedores", responses = {
             @ApiResponse(description = "Sucesso", responseCode = "200")})
     @GetMapping
-    public ResponseEntity<List<VendedorDtoOut>> retornarTodos() {
-        var vendedores = this.vendedorService.retornarTodos()
+    public ResponseEntity<List<EntityModel<VendedorDtoOut>>> retornarTodos() {
+        var vendedores =
+                this.vendedorService.retornarTodos()
                 .stream()
-                .map(v -> new VendedorDtoOut(v))
+                .map(v -> {
+                    var model = EntityModel.of(new VendedorDtoOut(v));
+                    return model.add(Link.of("https://localhost/v1/vendedor/" + model.getContent().getUid()));
+                })
                 .collect(toList());
 
         return ResponseEntity.ok(vendedores);
