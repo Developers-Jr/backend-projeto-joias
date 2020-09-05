@@ -24,6 +24,14 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
+		<!-- OpenAPI -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-ui</artifactId>
+			<version>1.4.6</version>
+		</dependency>
+
+
 		<!-- Security -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>
