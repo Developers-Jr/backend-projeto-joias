@@ -6,7 +6,7 @@ import com.caio.pjoias.repositories.VendedorRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.Optional;
 
 @Service
 public class VendedorService {
@@ -26,5 +26,14 @@ public class VendedorService {
 
     public List<Vendedor> retornarTodos() {
         return this.vendedorRepository.findAll();
+    }
+
+    public Vendedor buscarPor(String uid) throws VendedorException {
+        var vendedor = this.vendedorRepository.findById(uid);
+        if(vendedor.isPresent()) {
+            return vendedor.get();
+        }
+
+        throw new VendedorException("Not found!");
     }
 }

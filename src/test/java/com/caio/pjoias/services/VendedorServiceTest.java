@@ -83,4 +83,32 @@ public class VendedorServiceTest {
             assertThat(e.getMessage()).isEqualTo("Tente novamente!");
         }
     }
+
+    @Test
+    public void deveBuscarPorId() throws VendedorException {
+        //cenario
+        var vendedor = umVendedor().agora();
+        when(this.vendedorRepository.findById(anyString())).thenReturn(Optional.of(vendedor));
+
+        //acao
+        this.vendedorService.buscarPor(vendedor.getUid());
+
+        //verificacao
+        verify(this.vendedorRepository, times(1)).findById(anyString());
+    }
+
+    @Test
+    public void deveLancarExceptionSeVendedorNaoForEncontrado() {
+        //cenario
+        when(this.vendedorRepository.findById(anyString())).thenReturn(Optional.empty());
+
+        //acao
+        try {
+            this.vendedorService.buscarPor(anyString());
+            fail("Falha ao receber exceção esperada");
+        } catch(VendedorException e) {
+            //verificacao
+            assertThat(e.getMessage()).isEqualTo("Not found!");
+        }
+    }
 }
