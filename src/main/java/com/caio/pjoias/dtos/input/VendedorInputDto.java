@@ -1,4 +1,4 @@
-package com.caio.pjoias.dtos.in;
+package com.caio.pjoias.dtos.input;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 @Getter
 @Setter
-public class VendedorDtoIn implements Serializable {
+public class VendedorInputDto implements Serializable {
     private String uid;
 
     @NotEmpty(message = "Informe um nome")

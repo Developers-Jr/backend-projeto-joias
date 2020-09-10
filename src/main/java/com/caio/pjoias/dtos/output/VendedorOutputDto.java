@@ -1,21 +1,20 @@
-package com.caio.pjoias.dtos.out;
+package com.caio.pjoias.dtos.output;
 
 import com.caio.pjoias.models.Vendedor;
 import lombok.Getter;
-
 import java.io.Serializable;
 
 @Getter
-public class VendedorDtoOut implements Serializable {
+public class VendedorOutputDto implements Serializable {
     private String uid;
     private String nome;
     private String sobrenome;
     private String email;
     private String telefone;
 
-    public VendedorDtoOut() {}
+    public VendedorOutputDto() {}
 
-    public VendedorDtoOut(Vendedor vendedor) {
+    public VendedorOutputDto(Vendedor vendedor) {
         this.uid = vendedor.getUid();
         this.nome = vendedor.getNome();
         this.sobrenome = vendedor.getSobrenome();

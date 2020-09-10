@@ -1,12 +1,12 @@
 package com.caio.pjoias.services;
 
+import com.caio.pjoias.dtos.update.VendedorUpdateDto;
 import com.caio.pjoias.exceptions.VendedorException;
 import com.caio.pjoias.models.Vendedor;
 import com.caio.pjoias.repositories.VendedorRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class VendedorService {
@@ -35,5 +35,22 @@ public class VendedorService {
         }
 
         throw new VendedorException("Not found!");
+    }
+
+    public Vendedor atualizar(VendedorUpdateDto updateVendedor) throws VendedorException {
+        Vendedor vendedor = this
+                .vendedorRepository
+                .findById(updateVendedor.getUid())
+                .orElseThrow(() -> new VendedorException("Vendedor inexistente!"));
+
+        if(updateVendedor.verificarEmailValido()) {
+            vendedor.setEmail(updateVendedor.getEmail());
+        }
+
+        if(updateVendedor.verificarTelefoneValido()) {
+            vendedor.setTelefone(updateVendedor.getTelefone());
+        }
+
+        return this.vendedorRepository.save(vendedor);
     }
 }

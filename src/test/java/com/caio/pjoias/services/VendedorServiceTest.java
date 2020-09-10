@@ -1,5 +1,6 @@
 package com.caio.pjoias.services;
 
+import com.caio.pjoias.dtos.update.VendedorUpdateDto;
 import com.caio.pjoias.exceptions.VendedorException;
 import com.caio.pjoias.models.Vendedor;
 import com.caio.pjoias.repositories.VendedorRepository;
@@ -7,7 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 
 import java.util.Arrays;
 import java.util.List;
@@ -85,20 +85,20 @@ public class VendedorServiceTest {
     }
 
     @Test
-    public void deveBuscarPorId() throws VendedorException {
+    public void deveBuscarPorUid() throws VendedorException {
         //cenario
         var vendedor = umVendedor().agora();
         when(this.vendedorRepository.findById(anyString())).thenReturn(Optional.of(vendedor));
 
         //acao
-        this.vendedorService.buscarPor(vendedor.getUid());
+        var vendedorRetornado = this.vendedorService.buscarPor(vendedor.getUid());
 
         //verificacao
-        verify(this.vendedorRepository, times(1)).findById(anyString());
+        assertThat(vendedorRetornado).isEqualTo(vendedor);
     }
 
     @Test
-    public void deveLancarExceptionSeVendedorNaoForEncontrado() {
+    public void deveLancarVendedorExceptionSeVendedorNaoForEncontrado() {
         //cenario
         when(this.vendedorRepository.findById(anyString())).thenReturn(Optional.empty());
 
@@ -110,5 +110,24 @@ public class VendedorServiceTest {
             //verificacao
             assertThat(e.getMessage()).isEqualTo("Not found!");
         }
+    }
+
+    @Test
+    public void deveAtualizarDadosVendedorPorUid() throws VendedorException {
+        //cenario
+        var vendedor = umVendedor().comUid("uid-teste").agora();
+
+        var vendedorDadosUpdate = new VendedorUpdateDto();
+        vendedorDadosUpdate.setUid("uid-teste");
+        vendedorDadosUpdate.setEmail("update@email.teste");
+        vendedorDadosUpdate.setTelefone("199999-9999");
+
+        when(this.vendedorRepository.findById(anyString())).thenReturn(Optional.of(vendedor));
+
+        //acao
+        this.vendedorService.atualizar(vendedorDadosUpdate);
+
+        //verificar
+        verify(this.vendedorRepository, times(1)).save(any(Vendedor.class));
     }
 }

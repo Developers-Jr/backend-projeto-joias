@@ -1,6 +1,6 @@
 package com.caio.pjoias.models;
 
-import com.caio.pjoias.dtos.in.VendedorDtoIn;
+import com.caio.pjoias.dtos.input.VendedorInputDto;
 import com.caio.pjoias.utils.PasswordUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +8,8 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
-import java.util.UUID;
+
+import static java.util.UUID.randomUUID;
 
 @Getter
 @Setter
@@ -34,15 +35,10 @@ public class Vendedor implements Serializable {
     @Column(name = "telefone")
     private String telefone;
 
-    @Transient
-    private GeraUid geraUid = () -> {
-        return UUID.randomUUID().toString();
-    };
-
     public Vendedor() {}
 
-    public Vendedor(VendedorDtoIn dto) {
-        this.uid = dto.getUid() != null ? dto.getUid() : geraUid.gerarUid();
+    public Vendedor(VendedorInputDto dto) {
+        this.uid = dto.getUid() != null ? dto.getUid() : randomUUID().toString();
         this.nome = dto.getNome();
         this.sobrenome = dto.getSobrenome();
         this.email = dto.getEmail();
@@ -74,15 +70,10 @@ public class Vendedor implements Serializable {
     public String toString() {
         return "Vendedor{" +
                 "uid='"+ uid + '\'' +
-                "nome='" + nome + '\'' +
+                ", nome='" + nome + '\'' +
                 ", sobrenome='" + sobrenome + '\'' +
                 ", email='" + email + '\'' +
                 ", senha='" + senha + '\'' +
                 '}';
     }
-}
-
-@FunctionalInterface
-interface GeraUid {
-    String gerarUid();
 }
